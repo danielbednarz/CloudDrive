@@ -21,13 +21,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudDrive.Domain", "CloudD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudDrive.DependencyResolver", "CloudDrive.DependencyInjection\CloudDrive.DependencyResolver.csproj", "{E2AE3A48-A417-4A1B-9B21-A15ED8929687}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudDrive.Data.Repositories", "CloudDrive.Data.Repositories\CloudDrive.Data.Repositories.csproj", "{1D900D6C-D44D-433A-B86A-0736935B87D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudDrive.Data.Repositories", "CloudDrive.Data.Repositories\CloudDrive.Data.Repositories.csproj", "{1D900D6C-D44D-433A-B86A-0736935B87D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudDrive.Data.Abstraction", "CloudDrive.Data.Abstraction\CloudDrive.Data.Abstraction.csproj", "{7DA4E88E-8132-487A-A270-54BDE4A5C8B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudDrive.Data.Abstraction", "CloudDrive.Data.Abstraction\CloudDrive.Data.Abstraction.csproj", "{7DA4E88E-8132-487A-A270-54BDE4A5C8B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudDrive.Application.Abstraction", "CloudDrive.Application.Abstraction\CloudDrive.Application.Abstraction.csproj", "{7DDC6C76-2605-41D7-82BD-A4C101388693}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudDrive.Application.Abstraction", "CloudDrive.Application.Abstraction\CloudDrive.Application.Abstraction.csproj", "{7DDC6C76-2605-41D7-82BD-A4C101388693}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudDrive.Application.Services", "CloudDrive.Application.Services\CloudDrive.Application.Services.csproj", "{7F562B80-9452-42F8-AD22-DD589BD9E868}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudDrive.Application.Services", "CloudDrive.Application.Services\CloudDrive.Application.Services.csproj", "{7F562B80-9452-42F8-AD22-DD589BD9E868}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "CloudDrive.Vue", "CloudDrive.Vue\CloudDrive.Vue.esproj", "{546BB76B-9B2D-4D27-BC58-5103E4FED781}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +69,12 @@ Global
 		{7F562B80-9452-42F8-AD22-DD589BD9E868}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F562B80-9452-42F8-AD22-DD589BD9E868}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F562B80-9452-42F8-AD22-DD589BD9E868}.Release|Any CPU.Build.0 = Release|Any CPU
+		{546BB76B-9B2D-4D27-BC58-5103E4FED781}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{546BB76B-9B2D-4D27-BC58-5103E4FED781}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{546BB76B-9B2D-4D27-BC58-5103E4FED781}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{546BB76B-9B2D-4D27-BC58-5103E4FED781}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{546BB76B-9B2D-4D27-BC58-5103E4FED781}.Release|Any CPU.Build.0 = Release|Any CPU
+		{546BB76B-9B2D-4D27-BC58-5103E4FED781}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +88,7 @@ Global
 		{7DA4E88E-8132-487A-A270-54BDE4A5C8B9} = {B3CC7786-15BD-46A1-AF58-7902088C6862}
 		{7DDC6C76-2605-41D7-82BD-A4C101388693} = {26BFFE0C-3173-435E-A521-661B5E1E65C9}
 		{7F562B80-9452-42F8-AD22-DD589BD9E868} = {26BFFE0C-3173-435E-A521-661B5E1E65C9}
+		{546BB76B-9B2D-4D27-BC58-5103E4FED781} = {9A76DF35-1027-489E-8894-825D3FBFB7F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {64EA95DE-F32A-47F3-97BF-13ACE0D34C95}
