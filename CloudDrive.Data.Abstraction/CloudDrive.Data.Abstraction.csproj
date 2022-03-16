@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CloudDrive.Application.Abstraction\CloudDrive.Application.Abstraction.csproj" />
+  </ItemGroup>
+
 </Project>

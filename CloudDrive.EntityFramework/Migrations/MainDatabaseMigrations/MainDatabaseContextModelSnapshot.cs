@@ -31,7 +31,11 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<long>("FileVersion")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("Size")

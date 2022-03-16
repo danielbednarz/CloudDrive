@@ -12,10 +12,18 @@ namespace CloudDrive.WebAPI
             _fileService = fileService;
         }
 
-        [HttpPost]
-        public ActionResult Post()
+        [HttpPost("uploadFile")]
+        public async Task<ActionResult> UploadFile(IFormFile file)
         {
-            _fileService.AddFile();
+            if (file.Length > 0)
+            {
+                AddUserFileVM userFile = new()
+                {
+                    File = file
+                };
+
+                await _fileService.AddFile(userFile);
+            }
 
             return Ok();
         }

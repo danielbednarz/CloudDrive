@@ -1,7 +1,9 @@
-﻿namespace CloudDrive.Data.Interfaces
+﻿using CloudDrive.Application;
+
+namespace CloudDrive.Data.Interfaces
 {
     public interface IFileRepository
     {
-        void AddFile();
+        Task AddFile(AddUserFileVM file);
     }
 }

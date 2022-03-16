@@ -2,6 +2,6 @@
 {
     public interface IFileService
     {
-        void AddFile();
+        Task AddFile(AddUserFileVM file);
     }
 }
