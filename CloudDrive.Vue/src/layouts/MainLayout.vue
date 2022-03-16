@@ -1,17 +1,19 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <q-header bordered>
       <q-toolbar>
         <q-btn
           flat
           dense
           round
-          icon="menu"
+          :icon="getIcon()"
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title> CloudDrive </q-toolbar-title>
+        <q-toolbar-title
+          ><i class="fa-solid fa-cloud q-mx-xs"></i> CloudDrive
+        </q-toolbar-title>
 
         <div>Zalogowano jako: {{ user }}</div>
       </q-toolbar>
@@ -56,6 +58,14 @@ const linksList = [
     isTargetBlank: false,
   },
   {
+    title: "Dodaj plik",
+    caption: "Dodaj nową zawartość do dysku",
+    icon: "fa-solid fa-file-arrow-up",
+    internalPathName: "upload",
+    isTargetBlank: false,
+    separator: true,
+  },
+  {
     title: "Repozytorium",
     caption: "Repozytorium na platformie GitHub",
     icon: "fa-brands fa-github",
@@ -74,13 +84,19 @@ export default {
   },
   data() {
     return {
-      leftDrawerOpen: false,
+      leftDrawerOpen: true,
+      rightDrawerOpen: false,
       essentialLinks: linksList,
     };
   },
   methods: {
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen;
+    },
+    getIcon() {
+      return this.leftDrawerOpen
+        ? "fa-solid fa-square-caret-left"
+        : "fa-solid fa-ellipsis";
     },
   },
 };

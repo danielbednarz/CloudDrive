@@ -14,6 +14,7 @@
       <q-item-label caption>{{ caption }}</q-item-label>
     </q-item-section>
   </q-item>
+  <q-separator inset class="q-my-md" v-if="separator" />
 </template>
 
 <script>
@@ -48,6 +49,11 @@ export default defineComponent({
     },
 
     isTargetBlank: {
+      type: Boolean,
+      default: false,
+    },
+
+    separator: {
       type: Boolean,
       default: false,
     },

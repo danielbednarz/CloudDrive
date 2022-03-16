@@ -13,6 +13,11 @@ const routes = [
         name: "drive",
         component: () => import("pages/DrivePage.vue"),
       },
+      {
+        path: "upload",
+        name: "upload",
+        component: () => import("pages/UploadPage.vue"),
+      },
     ],
   },
 

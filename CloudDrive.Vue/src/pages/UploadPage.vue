@@ -4,14 +4,19 @@
     enter-active-class="animated fadeIn"
     leave-active-class="animated fadeOut"
   >
-    <q-page class="flex flex-center">
-      <div class="q-pa-sm">DrivePage</div>
+    <q-page class="flex justify-center">
+      <FileUploader />
     </q-page>
   </transition>
 </template>
 
 <script>
+import FileUploader from "../components/FileUploader.vue";
+
 export default {
-  name: "DrivePage",
+  name: "UploadPage",
+  components: {
+    FileUploader,
+  },
 };
 </script>
