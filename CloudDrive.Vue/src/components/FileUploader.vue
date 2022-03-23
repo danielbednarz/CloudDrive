@@ -9,7 +9,7 @@
         </div>
         <div class="row justify-center">
           <q-uploader
-            url="http://localhost:4444/upload"
+            url="https://localhost:44390/api/File/uploadFile"
             color="secondary"
             text-color="dark"
             square

@@ -1,5 +1,7 @@
 ﻿using CloudDrive.Application;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection.Metadata;
 
 namespace CloudDrive.WebAPI
 {
@@ -13,8 +15,10 @@ namespace CloudDrive.WebAPI
         }
 
         [HttpPost("uploadFile")]
-        public async Task<ActionResult> UploadFile(IFormFile file)
+        public async Task<IActionResult> UploadFile()
         {
+            var file = Request.Form.Files.FirstOrDefault();
+
             if (file.Length > 0)
             {
                 AddUserFileVM userFile = new()
