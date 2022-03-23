@@ -15,7 +15,7 @@
           ><i class="fa-solid fa-cloud q-mx-xs"></i> CloudDrive
         </q-toolbar-title>
 
-        <div>Zalogowano jako: {{ user }}</div>
+        <div>Witaj, {{ user }}!</div>
       </q-toolbar>
     </q-header>
 

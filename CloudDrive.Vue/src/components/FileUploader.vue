@@ -1,36 +1,28 @@
 <template>
-  <div class="q-pa-sm">
-    <q-responsive :ratio="16 / 9" class="big-container q-mt-xl">
-      <div class="rounded-borders bg-primary text-white text-center">
-        <div class="row">
-          <p class="text-h3 full-width text-center q-mt-xl">
-            Dodawanie pliku do dysku
-          </p>
-        </div>
-        <div class="row justify-center">
-          <q-uploader
-            url="https://localhost:44390/api/File/uploadFile"
-            color="secondary"
-            text-color="dark"
-            square
-            flat
-            bordered
-            class="uploader q-mt-lg"
-            @added="added"
-            @removed="clearForm"
-            @uploading="onUploading"
-            @uploaded="onUploaded"
-            @failed="onError"
-          />
-        </div>
-      </div>
-    </q-responsive>
-  </div>
+  <main-container title="Dodaj plik">
+    <div class="row justify-center">
+      <q-uploader
+        url="https://localhost:44390/api/File/uploadFile"
+        color="secondary"
+        text-color="dark"
+        square
+        flat
+        bordered
+        class="uploader q-mt-lg"
+        @added="added"
+        @removed="clearForm"
+        @uploading="onUploading"
+        @uploaded="onUploaded"
+        @failed="onError"
+      />
+    </div>
+  </main-container>
 </template>
 <script>
 import { useUploadStore } from "../stores/upload.js";
 import { mapActions, mapWritableState } from "pinia";
 import { useQuasar } from "quasar";
+import MainContainer from "./MainContainer";
 
 export default {
   name: "UploadPage",
@@ -67,6 +59,9 @@ export default {
         message: "Wystąpił błąd podczas dodawania pliku!",
       });
     },
+  },
+  components: {
+    MainContainer,
   },
   beforeUnmount() {
     this.clearForm();

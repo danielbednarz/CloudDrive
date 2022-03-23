@@ -1,0 +1,24 @@
+body.body--dark {
+  background: $background-dark;
+}
+
+body.body--light {
+  background: $secondary;
+}
+
+// light mode fix
+.q-drawer {
+  background: $primary;
+  color: #fff;
+  .q-separator {
+    background: rgba(255, 255, 255, 0.28);
+  }
+  .q-item__label--header {
+    color: #fff;
+    opacity: 0.8;
+  }
+  .q-item__label--caption {
+    color: #fff;
+    opacity: 0.6;
+  }
+}
