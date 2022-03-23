@@ -4,14 +4,19 @@
     enter-active-class="animated fadeIn"
     leave-active-class="animated fadeOut"
   >
-    <q-page class="flex flex-center">
-      <div class="q-pa-sm">DrivePage</div>
+    <q-page class="flex justify-center">
+      <main-container title="Mój dysk"></main-container>
     </q-page>
   </transition>
 </template>
 
 <script>
+import MainContainer from "../components/MainContainer";
+
 export default {
   name: "DrivePage",
+  components: {
+    MainContainer,
+  },
 };
 </script>
