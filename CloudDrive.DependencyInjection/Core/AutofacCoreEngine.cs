@@ -1,8 +1,8 @@
 ﻿using Autofac;
-using CloudDrive.Data.Repositories;
-using CloudDrive.Data.Interfaces;
-using CloudDrive.EntityFramework;
 using CloudDrive.Application;
+using CloudDrive.Data.Abstraction;
+using CloudDrive.Data.Repositories;
+using CloudDrive.EntityFramework;
 
 namespace CloudDrive.DependencyResolver
 {
@@ -20,8 +20,14 @@ namespace CloudDrive.DependencyResolver
             builder.RegisterType<FileRepository>().As<IFileRepository>().InstancePerLifetimeScope();
             builder.RegisterType<FileRepository>().As<FileRepository>().InstancePerLifetimeScope();
 
+            builder.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<UserRepository>().As<UserRepository>().InstancePerLifetimeScope();
+
             builder.RegisterType<FileService>().As<IFileService>().InstancePerLifetimeScope();
             builder.RegisterType<FileService>().As<FileService>().InstancePerLifetimeScope();
+
+            builder.RegisterType<TokenService>().As<ITokenService>().InstancePerLifetimeScope();
+            builder.RegisterType<TokenService>().As<TokenService>().InstancePerLifetimeScope();
         }
     }
 

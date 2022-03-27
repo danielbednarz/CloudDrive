@@ -43,6 +43,16 @@ namespace CloudDrive.Data.Repositories
             return _context.Set<T>().Find(id);
         }
 
+        public T? FirstOrDefault(Expression<Func<T, bool>> whereCondition)
+        {
+            return _context.Set<T>().Where(whereCondition).FirstOrDefault();
+        }
+
+        public async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> whereCondition)
+        {
+            return await _context.Set<T>().Where(whereCondition).FirstOrDefaultAsync();
+        }
+
         public IEnumerable<T> GetAll()
         {
             return _context.Set<T>().ToList();

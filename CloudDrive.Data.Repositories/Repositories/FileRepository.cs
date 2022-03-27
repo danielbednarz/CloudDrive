@@ -1,5 +1,5 @@
 ﻿using CloudDrive.Application;
-using CloudDrive.Data.Interfaces;
+using CloudDrive.Data.Abstraction;
 using CloudDrive.Domain;
 using CloudDrive.EntityFramework;
 

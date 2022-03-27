@@ -1,5 +1,5 @@
 ﻿using CloudDrive.Application.Abstraction;
-using CloudDrive.Data.Interfaces;
+using CloudDrive.Data.Abstraction;
 using Microsoft.Extensions.Configuration;
 
 namespace CloudDrive.Application
