@@ -28,6 +28,9 @@ namespace CloudDrive.DependencyResolver
 
             builder.RegisterType<TokenService>().As<ITokenService>().InstancePerLifetimeScope();
             builder.RegisterType<TokenService>().As<TokenService>().InstancePerLifetimeScope();
+
+            builder.RegisterType<UserService>().As<IUserService>().InstancePerLifetimeScope();
+            builder.RegisterType<UserService>().As<UserService>().InstancePerLifetimeScope();
         }
     }
 

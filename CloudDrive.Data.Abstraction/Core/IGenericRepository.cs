@@ -10,6 +10,7 @@ namespace CloudDrive.Data.Abstraction
     public interface IGenericRepository<T> where T : class
     {
         T? GetById(int id);
+        Task<IEnumerable<T>> GetAllAsync();
         IEnumerable<T> GetAll();
         T? Find(int id);
         T? FirstOrDefault(Expression<Func<T, bool>> whereCondition);
