@@ -57,6 +57,12 @@ namespace CloudDrive.Data.Repositories
         {
             return _context.Set<T>().ToList();
         }
+
+        public async Task<IEnumerable<T>> GetAllAsync()
+        {
+            return await _context.Set<T>().ToListAsync();
+        }
+
         public T? GetById(int id)
         {
             return _context.Set<T>().Find(id);
