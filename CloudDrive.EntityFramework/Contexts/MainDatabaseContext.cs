@@ -17,12 +17,14 @@ namespace CloudDrive.EntityFramework
         // dotnet ef database update
 
         public DbSet<UserFile> Files { get; set; }
+        public DbSet<FileOperationsLogs> FileOperationsLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<UserFile>().HasKey(x => x.Id);
+            modelBuilder.Entity<FileOperationsLogs>().HasKey(x => x.Id);
         }
     }
 }

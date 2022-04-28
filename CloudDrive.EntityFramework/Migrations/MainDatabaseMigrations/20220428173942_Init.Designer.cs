@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
 {
     [DbContext(typeof(MainDatabaseContext))]
-    [Migration("20220314192017_Init")]
+    [Migration("20220428173942_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,6 +23,28 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("CloudDrive.Domain.FileOperationsLogs", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OperationType")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserFileId");
+
+                    b.ToTable("FileOperationsLogs");
+                });
 
             modelBuilder.Entity("CloudDrive.Domain.UserFile", b =>
                 {
@@ -40,12 +62,35 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("RelativePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long>("Size")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.ToTable("Files");
+                });
+
+            modelBuilder.Entity("CloudDrive.Domain.FileOperationsLogs", b =>
+                {
+                    b.HasOne("CloudDrive.Domain.UserFile", "UserFile")
+                        .WithMany("FileOperationsLogs")
+                        .HasForeignKey("UserFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserFile");
+                });
+
+            modelBuilder.Entity("CloudDrive.Domain.UserFile", b =>
+                {
+                    b.Navigation("FileOperationsLogs");
                 });
 #pragma warning restore 612, 618
         }
