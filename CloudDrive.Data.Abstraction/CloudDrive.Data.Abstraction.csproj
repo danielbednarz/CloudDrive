@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CloudDrive.Application.Abstraction\CloudDrive.Application.Abstraction.csproj" />
+    <ProjectReference Include="..\CloudDrive.Domain\CloudDrive.Domain.csproj" />
   </ItemGroup>
 
 </Project>
