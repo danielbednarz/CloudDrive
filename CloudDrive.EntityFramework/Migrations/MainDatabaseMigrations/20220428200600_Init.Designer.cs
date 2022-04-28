@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
 {
     [DbContext(typeof(MainDatabaseContext))]
-    [Migration("20220428175646_Init")]
+    [Migration("20220428200600_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,15 +55,15 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("FileId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("OperationType")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("UserFileId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserFileId");
+                    b.HasIndex("FileId");
 
                     b.ToTable("FileOperationsLogs");
                 });
@@ -92,20 +92,41 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Files");
                 });
 
             modelBuilder.Entity("CloudDrive.Domain.FileOperationsLogs", b =>
                 {
-                    b.HasOne("CloudDrive.Domain.UserFile", "UserFile")
+                    b.HasOne("CloudDrive.Domain.UserFile", "File")
                         .WithMany("FileOperationsLogs")
-                        .HasForeignKey("UserFileId")
+                        .HasForeignKey("FileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("UserFile");
+                    b.Navigation("File");
+                });
+
+            modelBuilder.Entity("CloudDrive.Domain.UserFile", b =>
+                {
+                    b.HasOne("CloudDrive.Domain.AppUser", "User")
+                        .WithMany("UserFiles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CloudDrive.Domain.AppUser", b =>
+                {
+                    b.Navigation("UserFiles");
                 });
 
             modelBuilder.Entity("CloudDrive.Domain.UserFile", b =>

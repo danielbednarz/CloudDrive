@@ -34,11 +34,18 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                     FileVersion = table.Column<long>(type: "bigint", nullable: false),
                     RelativePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Files", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Files_AppUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AppUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -48,35 +55,40 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     OperationType = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserFileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    FileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FileOperationsLogs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FileOperationsLogs_Files_UserFileId",
-                        column: x => x.UserFileId,
+                        name: "FK_FileOperationsLogs_Files_FileId",
+                        column: x => x.FileId,
                         principalTable: "Files",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_FileOperationsLogs_UserFileId",
+                name: "IX_FileOperationsLogs_FileId",
                 table: "FileOperationsLogs",
-                column: "UserFileId");
+                column: "FileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Files_UserId",
+                table: "Files",
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AppUsers");
-
-            migrationBuilder.DropTable(
                 name: "FileOperationsLogs");
 
             migrationBuilder.DropTable(
                 name: "Files");
+
+            migrationBuilder.DropTable(
+                name: "AppUsers");
         }
     }
 }

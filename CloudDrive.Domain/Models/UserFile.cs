@@ -9,6 +9,8 @@
         public string RelativePath { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
+        public int UserId { get; set; }
+        public virtual AppUser User { get; set; }
         public virtual ICollection<FileOperationsLogs> FileOperationsLogs { get; set; }
     }
 }
