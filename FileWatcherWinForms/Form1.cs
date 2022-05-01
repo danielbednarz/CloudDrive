@@ -1,14 +1,16 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using Microsoft.Win32;
 
 namespace FileWatcherWinForms
 {
-    public partial class Form1 : Form
+    public partial class CloudDrive : Form
     {
-        public Form1()
+        public CloudDrive()
         {
             InitializeComponent();
+            AutoRunOnWindowsStartup();
         }
 
         
@@ -99,15 +101,21 @@ namespace FileWatcherWinForms
         {
             button_edit.Visible = false;
             button_save.Visible = true;
-            textBox1.ReadOnly = false;
+            observedPath.ReadOnly = false;
         }
 
         private void button_save_Click(object sender, EventArgs e)
         {
             button_save.Visible = false;
             button_edit.Visible = true;
-            textBox1.ReadOnly = true;
-            fileSystemWatcher1.Path = textBox1.Text;
+            observedPath.ReadOnly = true;
+            fileSystemWatcher1.Path = observedPath.Text;
+        }
+
+        private void AutoRunOnWindowsStartup()
+        {
+            RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            reg.SetValue("Cloud Drive", Application.ExecutablePath.ToString());
         }
     }
 }
