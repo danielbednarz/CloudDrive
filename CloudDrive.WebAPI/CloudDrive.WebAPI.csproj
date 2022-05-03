@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CloudDrive.Application.Abstraction\CloudDrive.Application.Abstraction.csproj" />
+    <ProjectReference Include="..\CloudDrive.Application.Hubs\CloudDrive.Application.Hubs.csproj" />
     <ProjectReference Include="..\CloudDrive.DependencyInjection\CloudDrive.DependencyResolver.csproj" />
   </ItemGroup>
 

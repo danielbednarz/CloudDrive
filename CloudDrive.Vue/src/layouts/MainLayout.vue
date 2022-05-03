@@ -116,6 +116,15 @@ export default {
     showLoginPopover() {
       this.isLoginPopoverVisible = true;
     },
+    onFileAdded({ id, fileName }) {
+      this.$q.notify({
+        type: "info",
+        message: `Z innego urządzenia został dodany nowy plik ${fileName}`,
+      });
+    },
+  },
+  mounted() {
+    this.$mitt.on("file-added", this.onFileAdded);
   },
 };
 </script>

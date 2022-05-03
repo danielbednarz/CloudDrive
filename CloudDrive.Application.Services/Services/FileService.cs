@@ -1,5 +1,6 @@
 ﻿using CloudDrive.Application.Abstraction;
 using CloudDrive.Data.Abstraction;
+using CloudDrive.Domain;
 using Microsoft.Extensions.Configuration;
 
 namespace CloudDrive.Application
@@ -15,7 +16,7 @@ namespace CloudDrive.Application
             _config = config;
         }
 
-        public async Task AddFile(AddUserFileVM file)
+        public async Task<UserFile> AddFile(AddUserFileVM file)
         {
             var fileName = file.File.FileName;
 
@@ -26,7 +27,9 @@ namespace CloudDrive.Application
                 await file.File.CopyToAsync(stream);
             }
 
-            await _fileRepository.AddFile(file);
+            UserFile userFile = await _fileRepository.AddFile(file);
+
+            return userFile;
         }
     }
 }

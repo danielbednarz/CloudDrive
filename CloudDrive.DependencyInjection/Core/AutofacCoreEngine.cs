@@ -31,6 +31,9 @@ namespace CloudDrive.DependencyResolver
 
             builder.RegisterType<UserService>().As<IUserService>().InstancePerLifetimeScope();
             builder.RegisterType<UserService>().As<UserService>().InstancePerLifetimeScope();
+
+            builder.RegisterType<UserService>().As<IUserService>().InstancePerLifetimeScope();
+            builder.RegisterType<UserService>().As<UserService>().InstancePerLifetimeScope();
         }
     }
 

@@ -31,9 +31,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudDrive.Application.Serv
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "CloudDrive.Vue", "CloudDrive.Vue\CloudDrive.Vue.esproj", "{546BB76B-9B2D-4D27-BC58-5103E4FED781}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudDrive.Dictionaries", "CloudDrive.Dictionaries\CloudDrive.Dictionaries.csproj", "{5DA61A8C-16BC-4608-B00D-6B064D351342}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudDrive.Dictionaries", "CloudDrive.Dictionaries\CloudDrive.Dictionaries.csproj", "{5DA61A8C-16BC-4608-B00D-6B064D351342}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileWatcherWinForms", "FileWatcherWinForms\FileWatcherWinForms.csproj", "{AA8DA43A-E518-48A5-AD23-858D53500E4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudDrive.Application.Hubs", "CloudDrive.Application.Hubs\CloudDrive.Application.Hubs.csproj", "{25A4070B-1B10-4761-8196-6BD2E52339C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{AA8DA43A-E518-48A5-AD23-858D53500E4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA8DA43A-E518-48A5-AD23-858D53500E4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA8DA43A-E518-48A5-AD23-858D53500E4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25A4070B-1B10-4761-8196-6BD2E52339C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25A4070B-1B10-4761-8196-6BD2E52339C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25A4070B-1B10-4761-8196-6BD2E52339C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25A4070B-1B10-4761-8196-6BD2E52339C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +108,7 @@ Global
 		{7F562B80-9452-42F8-AD22-DD589BD9E868} = {26BFFE0C-3173-435E-A521-661B5E1E65C9}
 		{546BB76B-9B2D-4D27-BC58-5103E4FED781} = {9A76DF35-1027-489E-8894-825D3FBFB7F4}
 		{5DA61A8C-16BC-4608-B00D-6B064D351342} = {B3CC7786-15BD-46A1-AF58-7902088C6862}
+		{25A4070B-1B10-4761-8196-6BD2E52339C4} = {26BFFE0C-3173-435E-A521-661B5E1E65C9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {64EA95DE-F32A-47F3-97BF-13ACE0D34C95}
