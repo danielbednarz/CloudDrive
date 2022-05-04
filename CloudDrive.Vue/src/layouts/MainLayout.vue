@@ -43,6 +43,7 @@
       <login-form
         v-if="isLoginPopoverVisible"
         :isLoginPopoverVisibleProp="isLoginPopoverVisible"
+        @closePopover="hideLoginPopover"
       />
       <router-view />
     </q-page-container>
@@ -116,6 +117,9 @@ export default {
     showLoginPopover() {
       this.isLoginPopoverVisible = true;
     },
+    hideLoginPopover() {
+      this.isLoginPopoverVisible = false;
+    },
     onFileAdded({ id, fileName }) {
       this.$q.notify({
         type: "info",
@@ -125,6 +129,9 @@ export default {
   },
   mounted() {
     this.$mitt.on("file-added", this.onFileAdded);
+  },
+  beforeUnmount() {
+    this.$mitt.off("file-added", this.onFileAdded);
   },
 };
 </script>
