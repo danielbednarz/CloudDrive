@@ -31,31 +31,34 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CloudDrive));
             this.button_save = new System.Windows.Forms.Button();
-            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.Cloud = new System.Windows.Forms.NotifyIcon(this.components);
             this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
             this.observedPath = new System.Windows.Forms.TextBox();
             this.button_edit = new System.Windows.Forms.Button();
+            this.password = new System.Windows.Forms.TextBox();
+            this.username = new System.Windows.Forms.TextBox();
+            this.login = new System.Windows.Forms.Button();
+            this.nameApp = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
             this.SuspendLayout();
             // 
             // button_save
             // 
-            this.button_save.Location = new System.Drawing.Point(485, 39);
-            this.button_save.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.button_save.Location = new System.Drawing.Point(424, 29);
             this.button_save.Name = "button_save";
-            this.button_save.Size = new System.Drawing.Size(171, 31);
+            this.button_save.Size = new System.Drawing.Size(150, 23);
             this.button_save.TabIndex = 0;
             this.button_save.Text = "Zapisz";
             this.button_save.UseVisualStyleBackColor = true;
             this.button_save.Visible = false;
             this.button_save.Click += new System.EventHandler(this.button_save_Click);
             // 
-            // notifyIcon1
+            // Cloud
             // 
-            this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
-            this.notifyIcon1.Text = "notifyIcon1";
-            this.notifyIcon1.Visible = true;
-            this.notifyIcon1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseClick);
+            this.Cloud.Icon = ((System.Drawing.Icon)(resources.GetObject("Cloud.Icon")));
+            this.Cloud.Text = "notifyIcon1";
+            this.Cloud.Visible = true;
+            this.Cloud.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseClick);
             // 
             // fileSystemWatcher1
             // 
@@ -71,37 +74,82 @@
             // 
             // observedPath
             // 
-            this.observedPath.Location = new System.Drawing.Point(64, 39);
-            this.observedPath.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.observedPath.Location = new System.Drawing.Point(56, 29);
             this.observedPath.Name = "observedPath";
             this.observedPath.ReadOnly = true;
-            this.observedPath.Size = new System.Drawing.Size(388, 27);
+            this.observedPath.Size = new System.Drawing.Size(340, 23);
             this.observedPath.TabIndex = 1;
             this.observedPath.Text = "E:\\test";
             // 
             // button_edit
             // 
-            this.button_edit.Location = new System.Drawing.Point(485, 39);
-            this.button_edit.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.button_edit.Location = new System.Drawing.Point(424, 29);
             this.button_edit.Name = "button_edit";
-            this.button_edit.Size = new System.Drawing.Size(171, 31);
+            this.button_edit.Size = new System.Drawing.Size(150, 23);
             this.button_edit.TabIndex = 2;
             this.button_edit.Text = "Edytuj";
             this.button_edit.UseVisualStyleBackColor = true;
             this.button_edit.Click += new System.EventHandler(this.button_edit_Click);
             // 
+            // password
+            // 
+            this.password.Location = new System.Drawing.Point(410, 179);
+            this.password.Name = "password";
+            this.password.PlaceholderText = "hasło";
+            this.password.Size = new System.Drawing.Size(160, 23);
+            this.password.TabIndex = 3;
+            // 
+            // username
+            // 
+            this.username.Location = new System.Drawing.Point(150, 179);
+            this.username.Name = "username";
+            this.username.PlaceholderText = "nazwa użytkownika";
+            this.username.Size = new System.Drawing.Size(160, 23);
+            this.username.TabIndex = 4;
+            // 
+            // login
+            // 
+            this.login.FlatAppearance.BorderSize = 0;
+            this.login.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.login.Location = new System.Drawing.Point(280, 229);
+            this.login.Name = "login";
+            this.login.Size = new System.Drawing.Size(160, 23);
+            this.login.TabIndex = 5;
+            this.login.Text = "Zaloguj się";
+            this.login.UseVisualStyleBackColor = true;
+            this.login.Click += new System.EventHandler(this.login_Click);
+            // 
+            // nameApp
+            // 
+            this.nameApp.AutoSize = true;
+            this.nameApp.Font = new System.Drawing.Font("Segoe UI", 60F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.nameApp.ForeColor = System.Drawing.Color.White;
+            this.nameApp.Location = new System.Drawing.Point(150, 29);
+            this.nameApp.Name = "nameApp";
+            this.nameApp.Size = new System.Drawing.Size(436, 106);
+            this.nameApp.TabIndex = 6;
+            this.nameApp.Text = "CloudDrive";
+            this.nameApp.Click += new System.EventHandler(this.label1_Click);
+            // 
             // CloudDrive
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(802, 405);
+            this.BackColor = System.Drawing.Color.Silver;
+            this.ClientSize = new System.Drawing.Size(704, 301);
+            this.Controls.Add(this.nameApp);
+            this.Controls.Add(this.login);
+            this.Controls.Add(this.username);
+            this.Controls.Add(this.password);
             this.Controls.Add(this.button_edit);
             this.Controls.Add(this.observedPath);
             this.Controls.Add(this.button_save);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "CloudDrive";
             this.Text = "CloudDrive";
+            this.Load += new System.EventHandler(this.CloudDrive_Load);
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -111,9 +159,13 @@
         #endregion
 
         private Button button_save;
-        private NotifyIcon notifyIcon1;
+        private NotifyIcon Cloud;
         private FileSystemWatcher fileSystemWatcher1;
         private TextBox observedPath;
         private Button button_edit;
+        private Button login;
+        private TextBox username;
+        private TextBox password;
+        private Label nameApp;
     }
 }
