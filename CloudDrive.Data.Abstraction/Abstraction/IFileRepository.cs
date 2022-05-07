@@ -1,6 +1,6 @@
 ﻿using CloudDrive.Application;
 
-namespace CloudDrive.Data.Interfaces
+namespace CloudDrive.Data.Abstraction
 {
     public interface IFileRepository
     {

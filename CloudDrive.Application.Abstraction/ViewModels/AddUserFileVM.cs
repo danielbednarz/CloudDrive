@@ -5,7 +5,7 @@ namespace CloudDrive.Application
     public class AddUserFileVM
     {
         public IFormFile File { get; set; }
-        public long FileVersion { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public string Username { get; set; }
+        public int? UserId { get; set; }
     }
 }

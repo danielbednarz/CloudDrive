@@ -1,5 +1,5 @@
 ﻿using CloudDrive.Application;
-using CloudDrive.Data.Interfaces;
+using CloudDrive.Data.Abstraction;
 using CloudDrive.Domain;
 using CloudDrive.EntityFramework;
 
@@ -30,6 +30,7 @@ namespace CloudDrive.Data.Repositories
                 Size = file.File.Length,
                 FileVersion = fileVersion,
                 CreatedDate = DateTime.Now,
+                UserId = file.UserId.Value
             });
 
             await _context.SaveChangesAsync();

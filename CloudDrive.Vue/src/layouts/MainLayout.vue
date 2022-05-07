@@ -14,8 +14,16 @@
         <q-toolbar-title
           ><i class="fa-solid fa-cloud q-mx-xs"></i> CloudDrive
         </q-toolbar-title>
-
-        <div>Witaj, {{ user }}!</div>
+        <div v-if="user.token">Witaj, {{ user.username }}!</div>
+        <div v-else>
+          <q-btn
+            flat
+            round
+            icon="fa-solid fa-arrow-right-to-bracket"
+            aria-label="Zaloguj się"
+            @click="showLoginPopover"
+          />
+        </div>
       </q-toolbar>
     </q-header>
 
@@ -32,6 +40,10 @@
     </q-drawer>
 
     <q-page-container>
+      <login-form
+        v-if="isLoginPopoverVisible"
+        :isLoginPopoverVisibleProp="isLoginPopoverVisible"
+      />
       <router-view />
     </q-page-container>
   </q-layout>
@@ -39,8 +51,9 @@
 
 <script>
 import EssentialLink from "components/EssentialLink.vue";
-import { useMainStore } from "../stores/main.js";
+import { useAuthenticationStore } from "../stores/authentication.js";
 import { mapState } from "pinia";
+import LoginForm from "../components/LoginForm";
 
 const linksList = [
   {
@@ -77,16 +90,18 @@ const linksList = [
 export default {
   name: "MainLayout",
   computed: {
-    ...mapState(useMainStore, ["user"]),
+    ...mapState(useAuthenticationStore, ["user"]),
   },
   components: {
     EssentialLink,
+    LoginForm,
   },
   data() {
     return {
       leftDrawerOpen: true,
       rightDrawerOpen: false,
       essentialLinks: linksList,
+      isLoginPopoverVisible: false,
     };
   },
   methods: {
@@ -97,6 +112,9 @@ export default {
       return this.leftDrawerOpen
         ? "fa-solid fa-square-caret-left"
         : "fa-solid fa-ellipsis";
+    },
+    showLoginPopover() {
+      this.isLoginPopoverVisible = true;
     },
   },
 };

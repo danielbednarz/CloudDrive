@@ -14,6 +14,12 @@
         @uploading="onUploading"
         @uploaded="onUploaded"
         @failed="onError"
+        :headers="[
+          {
+            name: 'Authorization',
+            value: `Bearer ${this.currentUser.token}`,
+          },
+        ]"
       />
     </div>
   </main-container>
@@ -29,10 +35,14 @@ export default {
   data() {
     return {
       $q: useQuasar(),
+      currentUser: [],
     };
   },
   computed: {
     ...mapWritableState(useUploadStore, ["files"]),
+  },
+  mounted() {
+    this.currentUser = JSON.parse(localStorage.getItem("user"));
   },
   methods: {
     ...mapActions(useUploadStore, ["uploadFile", "clearForm"]),
