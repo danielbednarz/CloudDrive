@@ -1,14 +1,17 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using Microsoft.Win32;
 
 namespace FileWatcherWinForms
 {
-    public partial class Form1 : Form
+    public partial class CloudDrive : Form
     {
-        public Form1()
+        public CloudDrive()
         {
             InitializeComponent();
+            AutoRunOnWindowsStartup();
+            WindowAppearance();
         }
 
         
@@ -21,7 +24,7 @@ namespace FileWatcherWinForms
             if (this.WindowState == FormWindowState.Minimized && cursorNotInBar)
             {
                 this.ShowInTaskbar = false;
-                notifyIcon1.Visible = true;
+                Cloud.Visible = true;
                 this.Hide();
             }
         }
@@ -30,7 +33,7 @@ namespace FileWatcherWinForms
         {
             this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
-            notifyIcon1.Visible = false;
+            Cloud.Visible = false;
             this.Visible = true;
         }
 
@@ -99,15 +102,49 @@ namespace FileWatcherWinForms
         {
             button_edit.Visible = false;
             button_save.Visible = true;
-            textBox1.ReadOnly = false;
+            observedPath.ReadOnly = false;
         }
 
         private void button_save_Click(object sender, EventArgs e)
         {
             button_save.Visible = false;
             button_edit.Visible = true;
-            textBox1.ReadOnly = true;
-            fileSystemWatcher1.Path = textBox1.Text;
+            observedPath.ReadOnly = true;
+            fileSystemWatcher1.Path = observedPath.Text;
+        }
+
+        private void AutoRunOnWindowsStartup()
+        {
+            RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            reg.SetValue("Cloud Drive", Application.ExecutablePath.ToString());
+        }
+
+        private void CloudDrive_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void WindowAppearance()
+        {
+            this.BackColor = Color.FromArgb(6, 37, 63);
+            button_edit.Visible = false;
+            observedPath.Visible = false;
+            login.BackColor = Color.FromArgb(89, 159, 216);
+            login.ForeColor = Color.FromArgb(29, 29, 29);
+            password.PasswordChar = '*';
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            username.Select();
+            //login.FlatAppearance.BorderColor = Color.FromArgb(89, 159, 216);
+        }
+
+        private void login_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
