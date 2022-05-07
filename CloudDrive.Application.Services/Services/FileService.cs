@@ -25,7 +25,7 @@ namespace CloudDrive.Application
 
             file.UserId = _userRepository.FirstOrDefault(x => x.Username == file.Username)?.Id;
 
-            using var stream = File.Create($"{fileUploadConfig.SaveFilePath}\\{fileName}");
+            using var stream = File.Create($"{fileUploadConfig.SaveFilePath}\\{file.Username}\\{fileName}");
             await file.File.CopyToAsync(stream);
 
             await _fileRepository.AddFile(file);

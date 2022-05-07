@@ -1,7 +1,6 @@
 ﻿using CloudDrive.Application;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Reflection.Metadata;
 using System.Security.Claims;
 
 namespace CloudDrive.WebAPI
@@ -21,6 +20,11 @@ namespace CloudDrive.WebAPI
         {
             var file = Request.Form.Files.FirstOrDefault();
             var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
 
             if (file.Length > 0)
             {
