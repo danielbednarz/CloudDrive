@@ -146,7 +146,6 @@
             this.Controls.Add(this.button_save);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "CloudDrive";
             this.Text = "CloudDrive";
             this.Load += new System.EventHandler(this.CloudDrive_Load);
