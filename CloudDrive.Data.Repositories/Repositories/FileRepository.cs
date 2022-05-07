@@ -30,6 +30,7 @@ namespace CloudDrive.Data.Repositories
                 Size = file.File.Length,
                 FileVersion = fileVersion,
                 CreatedDate = DateTime.Now,
+                UserId = file.UserId.Value
             });
 
             await _context.SaveChangesAsync();

@@ -7,11 +7,13 @@ namespace CloudDrive.Application
     public class FileService : IFileService
     {
         private readonly IFileRepository _fileRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IConfiguration _config;
 
-        public FileService(IFileRepository fileRepository, IConfiguration config)
+        public FileService(IFileRepository fileRepository, IUserRepository userRepository, IConfiguration config)
         {
             _fileRepository = fileRepository;
+            _userRepository = userRepository;
             _config = config;
         }
 
@@ -21,10 +23,10 @@ namespace CloudDrive.Application
 
             var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();
 
-            using (var stream = File.Create($"{fileUploadConfig.SaveFilePath}\\{fileName}"))
-            {
-                await file.File.CopyToAsync(stream);
-            }
+            file.UserId = _userRepository.FirstOrDefault(x => x.Username == file.Username)?.Id;
+
+            using var stream = File.Create($"{fileUploadConfig.SaveFilePath}\\{fileName}");
+            await file.File.CopyToAsync(stream);
 
             await _fileRepository.AddFile(file);
         }

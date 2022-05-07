@@ -52,7 +52,7 @@ namespace CloudDrive.WebAPI.Controllers
         {
             return UserService.GetUsers();
         }
-
+        
         [Authorize]
         [HttpGet("getUser")]
         public async Task<ActionResult<AppUser>> GetUser(string username)
@@ -60,6 +60,7 @@ namespace CloudDrive.WebAPI.Controllers
             var user = await UserService.GetUser(username);
 
             return user == null ? NotFound("Brak użytkownika o podanej nazwie") : user;
+
         }
     }
 }

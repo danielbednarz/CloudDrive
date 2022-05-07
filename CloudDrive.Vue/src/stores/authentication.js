@@ -17,6 +17,9 @@ export const useAuthenticationStore = defineStore({
     async login() {
       await api.post("/Users/login", this.form).then((response) => {
         this.user = response.data;
+        this.$currentUser = response.data;
+        localStorage.setItem("user", JSON.stringify(this.user));
+        debugger;
       });
     },
     clearForm() {
