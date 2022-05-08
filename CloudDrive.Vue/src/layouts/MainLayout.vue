@@ -14,7 +14,7 @@
         <q-toolbar-title
           ><i class="fa-solid fa-cloud q-mx-xs"></i> CloudDrive
         </q-toolbar-title>
-        <div v-if="user.token">Witaj, {{ user.username }}!</div>
+        <div v-if="currentUser.token">Witaj, {{ currentUser.username }}!</div>
         <div v-else>
           <q-btn
             flat
@@ -51,8 +51,6 @@
 
 <script>
 import EssentialLink from "components/EssentialLink.vue";
-import { useAuthenticationStore } from "../stores/authentication.js";
-import { mapState } from "pinia";
 import LoginForm from "../components/LoginForm";
 
 const linksList = [
@@ -87,11 +85,11 @@ const linksList = [
   },
 ];
 
+import { mapWritableState } from "pinia";
+import { useAuthenticationStore } from "../stores/authentication.js";
+
 export default {
   name: "MainLayout",
-  computed: {
-    ...mapState(useAuthenticationStore, ["user"]),
-  },
   components: {
     EssentialLink,
     LoginForm,
@@ -103,6 +101,9 @@ export default {
       essentialLinks: linksList,
       isLoginPopoverVisible: false,
     };
+  },
+  computed: {
+    ...mapWritableState(useAuthenticationStore, ["currentUser"]),
   },
   methods: {
     toggleLeftDrawer() {
@@ -116,6 +117,13 @@ export default {
     showLoginPopover() {
       this.isLoginPopoverVisible = true;
     },
+  },
+  mounted() {
+    if (localStorage.user) {
+      let localStorageUser = JSON.parse(localStorage.user);
+      this.currentUser.username = localStorageUser.username;
+      this.currentUser.token = localStorageUser.token;
+    }
   },
 };
 </script>

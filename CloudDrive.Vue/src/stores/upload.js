@@ -6,9 +6,6 @@ export const useUploadStore = defineStore({
     files: [],
   }),
   actions: {
-    uploadFile(file) {
-      debugger;
-    },
     clearForm() {
       this.files = [];
     },

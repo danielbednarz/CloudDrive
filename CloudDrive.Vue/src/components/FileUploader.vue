@@ -17,16 +17,18 @@
         :headers="[
           {
             name: 'Authorization',
-            value: `Bearer ${this.currentUser.token}`,
+            value: `Bearer ${currentUser.token}`,
           },
         ]"
+        v-if="currentUser"
       />
     </div>
   </main-container>
 </template>
 <script>
 import { useUploadStore } from "../stores/upload.js";
-import { mapActions, mapWritableState } from "pinia";
+import { useAuthenticationStore } from "../stores/authentication.js";
+import { mapActions, mapWritableState, mapState } from "pinia";
 import { useQuasar } from "quasar";
 import MainContainer from "./MainContainer";
 
@@ -35,14 +37,11 @@ export default {
   data() {
     return {
       $q: useQuasar(),
-      currentUser: [],
     };
   },
   computed: {
     ...mapWritableState(useUploadStore, ["files"]),
-  },
-  mounted() {
-    this.currentUser = JSON.parse(localStorage.getItem("user"));
+    ...mapState(useAuthenticationStore, ["currentUser"]),
   },
   methods: {
     ...mapActions(useUploadStore, ["uploadFile", "clearForm"]),

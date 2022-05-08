@@ -8,7 +8,7 @@ export const useAuthenticationStore = defineStore({
       Username: "",
       Password: "",
     },
-    user: {
+    currentUser: {
       username: "",
       token: "",
     },
@@ -16,8 +16,9 @@ export const useAuthenticationStore = defineStore({
   actions: {
     async login() {
       await api.post("/Users/login", this.form).then((response) => {
-        this.user = response.data;
-        localStorage.setItem("user", JSON.stringify(this.user));
+        this.currentUser.username = response.data.username;
+        this.currentUser.token = response.data.token;
+        localStorage.setItem("user", JSON.stringify(response.data));
       });
     },
     clearForm() {

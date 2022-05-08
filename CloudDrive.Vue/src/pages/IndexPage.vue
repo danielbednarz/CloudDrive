@@ -12,14 +12,14 @@
           </p>
         </div>
         <div class="row full-width text-center q-mt-xl justify-center">
-          <div>
+          <!-- <div>
             <q-btn
               color="secondary"
               text-color="black"
               label="Logowanie"
               class="q-mr-md"
             />
-          </div>
+          </div> -->
           <div>
             <q-btn
               color="secondary"
