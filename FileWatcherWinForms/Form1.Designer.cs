@@ -62,7 +62,6 @@
             // 
             // fileSystemWatcher1
             // 
-            this.fileSystemWatcher1.EnableRaisingEvents = true;
             this.fileSystemWatcher1.IncludeSubdirectories = true;
             this.fileSystemWatcher1.Path = "E:\\test";
             this.fileSystemWatcher1.SynchronizingObject = this;

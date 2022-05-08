@@ -14,38 +14,9 @@ namespace FileWatcherWinForms
     {
         private static readonly string baseURL = "https://localhost:44390/api/";
 
-        //public static async Task<string> Login(string username, string password)
-        //{
-        //    var inputData = new Dictionary<string, string>
-        //    {
-        //        { "username", username },
-        //        { "password", password }
-        //    };
-        //    var input = new FormUrlEncodedContent(inputData);
-        //    using (HttpClient client = new HttpClient())
-        //    {
-        //        using (HttpResponseMessage res = await client.PostAsync(baseURL + "Users/login", input))
-        //        {
-        //            using (HttpContent content = res.Content)
-        //            {
-        //                string data = await content.ReadAsStringAsync();
-        //                if (data != null)
-        //                {
-        //                    return data;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return string.Empty;
-        //}
         public static async Task<string> Login(User user)
         {
-            //var inputData = new Dictionary<string, string>
-            //{
-            //    { "username", username },
-            //    { "password", password }
-            //};
-            //var input = new FormUrlEncodedContent(inputData);
+           
             using (HttpClient client = new HttpClient())
             {
                 using (HttpResponseMessage res = await client.PostAsJsonAsync(baseURL + "Users/login", user))
