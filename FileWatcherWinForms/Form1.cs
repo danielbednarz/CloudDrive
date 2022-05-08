@@ -1,20 +1,77 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 using Microsoft.Win32;
 
 namespace FileWatcherWinForms
 {
+    
     public partial class CloudDrive : Form
     {
+        //static HttpClient client = new HttpClient();
+
+        //static async Task<Uri> Register(User user)
+        //{
+        //    //var inputData = new Dictionary<string, string>
+        //    //{
+        //    //    {"username", "patryk" },
+        //    //    {"password", "patryk" }
+        //    //};
+        //    //var input = new FormUrlEncodedContent(inputData);
+        //    HttpResponseMessage response = await client.PostAsJsonAsync("Users/register", user);
+        //    response.EnsureSuccessStatusCode();
+
+        //    // return URI of the created resource.
+        //    return response.Headers.Location;
+        //}
+        //static async Task<Uri> Login(User user)
+        //{
+        //    //var inputData = new Dictionary<string, string>
+        //    //{
+        //    //    {"username", "patryk" },
+        //    //    {"password", "patryk" }
+        //    //};
+        //    //var input = new FormUrlEncodedContent(inputData);
+        //    HttpResponseMessage response = await client.PostAsJsonAsync("Users/login", user);
+        //   // response.EnsureSuccessStatusCode();
+
+        //    // return URI of the created resource.
+        //    return response.Headers.Location;
+        //}
+        //static async Task RunAsync(User user)
+        //{
+        //    client.BaseAddress = new Uri("https://localhost:44390/api/");
+        //    client.DefaultRequestHeaders.Accept.Clear();
+        //    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            
+        //    var url = await Login(user);
+        //    Debug.WriteLine(url);
+
+        //    //User user = new User
+        //    //{
+        //    //    username = "patryk3",
+        //    //    password = "patryk"
+        //    //};
+        //    //var url = await Register(user);
+        //    //Console.WriteLine($"Created at {url}");
+        //}
+
         public CloudDrive()
         {
             InitializeComponent();
             AutoRunOnWindowsStartup();
             WindowAppearance();
+            //nameApp.Text = "jeden";
+            //RunAsync().GetAwaiter().GetResult();
         }
 
-        
+
 
         protected override void OnResize(EventArgs e)
         {
@@ -39,7 +96,7 @@ namespace FileWatcherWinForms
 
         static void SaveLog(string log)
         {
- 
+
             string docPath = "E:\\ClientFW\\log";
             DateTime thisDay = DateTime.Now;
 
@@ -137,9 +194,16 @@ namespace FileWatcherWinForms
             //login.FlatAppearance.BorderColor = Color.FromArgb(89, 159, 216);
         }
 
-        private void login_Click(object sender, EventArgs e)
+        private async void login_Click(object sender, EventArgs e)
         {
-
+            User user = new User();
+            user.username = username.Text;
+            user.password = password.Text;
+            //var response = await RestHelper.Login(username.Text, password.Text);
+            var response = await RestHelper.Login(user);
+            Debug.WriteLine(response);
+            //Debug.WriteLine("Witaj..");
+            //RunAsync(user).GetAwaiter().GetResult();
         }
 
         private void label1_Click(object sender, EventArgs e)
