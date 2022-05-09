@@ -35,14 +35,11 @@ export default {
   data() {
     return {
       $q: useQuasar(),
-      currentUser: [],
+      currentUser: JSON.parse(localStorage.getItem("user")),
     };
   },
   computed: {
     ...mapWritableState(useUploadStore, ["files"]),
-  },
-  mounted() {
-    this.currentUser = JSON.parse(localStorage.getItem("user"));
   },
   methods: {
     ...mapActions(useUploadStore, ["uploadFile", "clearForm"]),
