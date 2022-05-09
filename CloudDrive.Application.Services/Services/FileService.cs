@@ -20,18 +20,35 @@ namespace CloudDrive.Application
 
         public async Task<UserFile> AddFile(AddUserFileVM file)
         {
-            var fileName = file.File.FileName;
-
             var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();
 
             file.UserId = _userRepository.FirstOrDefault(x => x.Username == file.Username)?.Id;
 
+            UserFile userFile = await _fileRepository.AddFile(file);
+            
+            var fileName = userFile.Id.ToString();
+
             using var stream = File.Create($"{fileUploadConfig.SaveFilePath}\\{file.Username}\\{fileName}");
             await file.File.CopyToAsync(stream);
 
-            UserFile userFile = await _fileRepository.AddFile(file);
-
             return userFile;
+        }
+
+        public async Task<DownloadFile> DownloadFile(Guid fileId, string username)
+        {
+            var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();
+            var file = await _fileRepository.GetFileById(fileId);
+
+            if (file == null)
+            {
+                return null;
+            }
+
+            string filePath = $"{fileUploadConfig.SaveFilePath}\\{username}\\{file.Id.ToString()}";
+
+            var bytes = await File.ReadAllBytesAsync(filePath);
+
+            return new DownloadFile { Bytes = bytes, Path = filePath, UserFile = file };
         }
     }
 }

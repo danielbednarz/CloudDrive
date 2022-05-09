@@ -33,6 +33,7 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                     Size = table.Column<long>(type: "bigint", nullable: false),
                     FileVersion = table.Column<long>(type: "bigint", nullable: false),
                     RelativePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false)

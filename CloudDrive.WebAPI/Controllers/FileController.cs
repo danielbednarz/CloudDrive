@@ -46,5 +46,26 @@ namespace CloudDrive.WebAPI
 
             return Ok();
         }
+
+        [Authorize]
+        [HttpGet("downloadFile")]
+        public async Task<IActionResult> DownloadFile(Guid fileId)
+        {
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            DownloadFile downloadedFile = await _fileService.DownloadFile(fileId, loggedUsername);
+
+            if (downloadedFile == null)
+            {
+                return NotFound("Brak pliku do pobrania");
+            }
+
+            return File(downloadedFile.Bytes, downloadedFile.UserFile.ContentType, downloadedFile.UserFile.Name);
+        }
     }
 }
