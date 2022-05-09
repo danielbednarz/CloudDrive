@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="isLoginPopoverVisible" position="top">
+  <q-dialog v-model="isLoginPopoverVisible" position="top" @hide="closePopover">
     <q-card class="container-login" bordered>
       <q-card-section class="row items-center no-wrap login-popover">
         <q-form class="q-gutter-md" @submit="tryLogin">
@@ -70,6 +70,7 @@ export default {
     closePopover() {
       this.isLoginPopoverVisible = false;
       this.clearForm();
+      this.$emit("closePopover");
     },
     async tryLogin() {
       await this.login();
