@@ -34,7 +34,7 @@ namespace CloudDrive.Application
             return userFile;
         }
 
-        public async Task<DownloadFile> DownloadFile(Guid fileId, string username)
+        public async Task<DownloadFileDTO> DownloadFile(Guid fileId, string username)
         {
             var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();
             var file = await _fileRepository.GetFileById(fileId);
@@ -48,7 +48,7 @@ namespace CloudDrive.Application
 
             var bytes = await File.ReadAllBytesAsync(filePath);
 
-            return new DownloadFile { Bytes = bytes, Path = filePath, UserFile = file };
+            return new DownloadFileDTO { Bytes = bytes, Path = filePath, UserFile = file };
         }
     }
 }

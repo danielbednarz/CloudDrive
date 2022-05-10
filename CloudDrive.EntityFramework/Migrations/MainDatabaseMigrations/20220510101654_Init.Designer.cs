@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
 {
     [DbContext(typeof(MainDatabaseContext))]
-    [Migration("20220509114132_Init")]
+    [Migration("20220510101654_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -68,6 +68,33 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                     b.ToTable("FileOperationsLogs");
                 });
 
+            modelBuilder.Entity("CloudDrive.Domain.UserDirectory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ParentDirectoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RelativePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentDirectoryId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserDirectories");
+                });
+
             modelBuilder.Entity("CloudDrive.Domain.UserFile", b =>
                 {
                     b.Property<Guid>("Id")
@@ -79,6 +106,9 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DirectoryId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<long>("FileVersion")
                         .HasColumnType("bigint");
@@ -100,6 +130,8 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DirectoryId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Files");
@@ -116,13 +148,36 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                     b.Navigation("File");
                 });
 
+            modelBuilder.Entity("CloudDrive.Domain.UserDirectory", b =>
+                {
+                    b.HasOne("CloudDrive.Domain.UserDirectory", "ParentDirectory")
+                        .WithMany()
+                        .HasForeignKey("ParentDirectoryId");
+
+                    b.HasOne("CloudDrive.Domain.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ParentDirectory");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("CloudDrive.Domain.UserFile", b =>
                 {
+                    b.HasOne("CloudDrive.Domain.UserDirectory", "Directory")
+                        .WithMany("Files")
+                        .HasForeignKey("DirectoryId");
+
                     b.HasOne("CloudDrive.Domain.AppUser", "User")
                         .WithMany("UserFiles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Directory");
 
                     b.Navigation("User");
                 });
@@ -130,6 +185,11 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
             modelBuilder.Entity("CloudDrive.Domain.AppUser", b =>
                 {
                     b.Navigation("UserFiles");
+                });
+
+            modelBuilder.Entity("CloudDrive.Domain.UserDirectory", b =>
+                {
+                    b.Navigation("Files");
                 });
 
             modelBuilder.Entity("CloudDrive.Domain.UserFile", b =>

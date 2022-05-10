@@ -1,6 +1,8 @@
-﻿namespace CloudDrive.Domain
+﻿using CloudDrive.Domain;
+
+namespace CloudDrive.Application
 {
-    public class DownloadFile
+    public class DownloadFileDTO
     {
         public byte[] Bytes { get; set; }
         public string Path { get; set; }

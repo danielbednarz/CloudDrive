@@ -12,11 +12,13 @@ namespace CloudDrive.WebAPI
     public class FileController : AppController
     {
         private readonly IFileService _fileService;
+        private readonly IDirectoryService _directoryService;
         private readonly IHubContext<FileHub, IFileHub> _hubContext;
 
-        public FileController(IFileService fileService, IHubContext<FileHub, IFileHub> hubContext)
+        public FileController(IFileService fileService, IDirectoryService directoryService, IHubContext<FileHub, IFileHub> hubContext)
         {
             _fileService = fileService;
+            _directoryService = directoryService;
             _hubContext = hubContext;
         }
 
@@ -46,6 +48,22 @@ namespace CloudDrive.WebAPI
 
             return Ok();
         }
+        
+        [Authorize]
+        [HttpPost("addDirectory")]
+        public async Task<IActionResult> AddDirectory(AddDirectoryVM model)
+        {
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            await _directoryService.AddDirectory(model, loggedUsername);
+
+            return Ok();
+        }
 
         [Authorize]
         [HttpGet("downloadFile")]
@@ -58,7 +76,7 @@ namespace CloudDrive.WebAPI
                 return NotFound("Błąd przy próbie znalezienia użytkownika");
             }
 
-            DownloadFile downloadedFile = await _fileService.DownloadFile(fileId, loggedUsername);
+            DownloadFileDTO downloadedFile = await _fileService.DownloadFile(fileId, loggedUsername);
 
             if (downloadedFile == null)
             {
