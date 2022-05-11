@@ -18,8 +18,9 @@ namespace CloudDrive.Data.Repositories
             await _context.UserDirectories.AddAsync(new UserDirectory
             {
                 Name = model.Name,
-                RelativePath = model.UserChosenPath,
-                UserId = model.UserId.Value
+                RelativePath = model.GeneratedPath,
+                UserId = model.UserId.Value,
+                ParentDirectoryId = model.ParentDirectoryId,
             });
 
             _context.SaveChanges();
@@ -28,6 +29,16 @@ namespace CloudDrive.Data.Repositories
         public bool IsDirectoryUnique(string path)
         {
            return !_context.UserDirectories.Any(x => x.RelativePath == path);
+        }
+
+        public async Task<List<DirectorySelectBoxVM>> GetDirectoriesToSelectList(int userId)
+        {
+           return await _context.UserDirectories.Where(x => x.UserId == userId).Select(x => new DirectorySelectBoxVM
+           {
+               Text = x.Name,
+               Value = x.Id,
+               ParentDirectoryId = x.ParentDirectoryId
+           }).ToListAsync();
         }
     }
 }

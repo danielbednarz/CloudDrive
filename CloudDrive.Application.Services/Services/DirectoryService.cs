@@ -38,19 +38,33 @@ namespace CloudDrive.Application
 
         public async Task AddDirectory(AddDirectoryVM model, string username)
         {
-            model.UserChosenPath = Regex.Replace($"{username}\\{model.UserChosenPath}\\{model.Name}", "\\\\", "\\");
+            if (model.ParentDirectoryId.HasValue)
+            {
+                UserDirectory parentDirectory = _directoryRepository.FirstOrDefault(x => x.Id == model.ParentDirectoryId) ?? throw new Exception("Wybrany folder nadrzedny nie istnieje");
+                model.GeneratedPath = Path.Combine(parentDirectory.RelativePath, model.Name);
+            }
+            else
+            {
+                model.GeneratedPath = Path.Combine(username, model.Name);
+            }
             AppUser user = _userRepository.FirstOrDefault(x => x.Username == username) ?? throw new Exception("Użytkownik nie istnieje");
             model.UserId = user.Id;
 
-            if (_directoryRepository.IsDirectoryUnique(model.UserChosenPath))
+            if (_directoryRepository.IsDirectoryUnique(model.GeneratedPath))
             {
-                CreateDirectoryOnServer(model.UserChosenPath);
+                CreateDirectoryOnServer(model.GeneratedPath);
                 await _directoryRepository.AddDirectory(model);
             }
             else
             {
                 throw new Exception("Folder o podanej ścieżce już istnieje");
             }
+        }
+
+        public async Task<List<DirectorySelectBoxVM>> GetDirectoriesToSelectList(string username)
+        {
+            AppUser user = _userRepository.FirstOrDefault(x => x.Username == username) ?? throw new Exception("Użytkownik nie istnieje");
+            return await _directoryRepository.GetDirectoriesToSelectList(user.Id);
         }
 
     }
