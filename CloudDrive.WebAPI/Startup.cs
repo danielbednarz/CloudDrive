@@ -1,7 +1,9 @@
 using Autofac;
 using CloudDrive.DependencyResolver;
 using CloudDrive.EntityFramework;
+using CloudDrive.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -71,6 +73,7 @@ namespace CloudDrive.WebAPI
                         ValidateAudience = false,
                     };
                 });
+            services.AddSignalR();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -104,6 +107,7 @@ namespace CloudDrive.WebAPI
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<FileHub>("/file-hub");
             });
         }
     }

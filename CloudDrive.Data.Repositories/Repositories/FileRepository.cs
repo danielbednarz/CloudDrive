@@ -2,6 +2,8 @@
 using CloudDrive.Data.Abstraction;
 using CloudDrive.Domain;
 using CloudDrive.EntityFramework;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace CloudDrive.Data.Repositories
 {
@@ -11,7 +13,7 @@ namespace CloudDrive.Data.Repositories
         {
         }
 
-        public async Task AddFile(AddUserFileVM file)
+        public async Task<UserFile> AddFile(AddUserFileVM file)
         {
             var fileName = file.File.FileName;
             long fileVersion = 0;
@@ -24,16 +26,25 @@ namespace CloudDrive.Data.Repositories
                 fileVersion += 1;
             }
 
-            _context.Files.Add(new UserFile
+            UserFile userFile = new UserFile()
             {
                 Name = fileName,
                 Size = file.File.Length,
                 FileVersion = fileVersion,
                 CreatedDate = DateTime.Now,
+                ContentType = file.File.ContentType,
                 UserId = file.UserId.Value
-            });
+            };
 
+            await _context.Files.AddAsync(userFile);
             await _context.SaveChangesAsync();
+
+            return userFile;
+        }
+
+        public async Task<UserFile> GetFileById(Guid fileId)
+        {
+            return await _context.Files.FirstOrDefaultAsync(x => x.Id == fileId);
         }
     }
 }

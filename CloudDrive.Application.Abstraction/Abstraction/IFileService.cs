@@ -1,7 +1,10 @@
-﻿namespace CloudDrive.Application
+﻿using CloudDrive.Domain;
+
+namespace CloudDrive.Application
 {
     public interface IFileService
     {
-        Task AddFile(AddUserFileVM file);
+        Task<UserFile> AddFile(AddUserFileVM file);
+        Task<DownloadFileDTO> DownloadFile(Guid fileId, string username);
     }
 }
