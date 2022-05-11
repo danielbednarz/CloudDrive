@@ -20,7 +20,7 @@ namespace CloudDrive.Data.Repositories
 
             if (_context.Files.Any(x => x.Name == fileName))
             {
-                fileVersion = _context.Files.Where(y => y.Name == fileName)
+                fileVersion = _context.Files.Where(y => y.Name == fileName && y.ContentType == file.File.ContentType)
                     .Select(x => x.FileVersion).ToList().Max();
 
                 fileVersion += 1;
@@ -33,6 +33,7 @@ namespace CloudDrive.Data.Repositories
                 FileVersion = fileVersion,
                 CreatedDate = DateTime.Now,
                 ContentType = file.File.ContentType,
+                RelativePath = @$"{userDirectory.RelativePath}\{fileName}",
                 UserId = file.UserId.Value,
                 DirectoryId = userDirectory.Id
             };
@@ -47,5 +48,21 @@ namespace CloudDrive.Data.Repositories
         {
             return await _context.Files.FirstOrDefaultAsync(x => x.Id == fileId);
         }
+
+        public async Task<UserFile> MarkFileAsDeleted(string filePath, int? userId)
+        {
+            var file = await _context.Files
+                .Where(x => x.RelativePath == filePath && x.User.Id == userId)
+                .OrderByDescending(x => x.FileVersion)
+                .FirstOrDefaultAsync();
+
+            file.IsDeleted = true;
+
+            _context.Files.Update(file);
+            await _context.SaveChangesAsync();
+
+            return file;
+        }
+
     }
 }

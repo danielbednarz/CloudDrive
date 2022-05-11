@@ -35,6 +35,20 @@ namespace CloudDrive.Application
             return userFile;
         }
 
+        public async Task DeleteFile(string relativePath, string username)
+        {
+            var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();
+
+            var userId = _userRepository.FirstOrDefault(x => x.Username == username)?.Id;
+
+            UserFile file = await _fileRepository.MarkFileAsDeleted(relativePath, userId);
+
+            string filePath = $"{fileUploadConfig.SaveFilePath}\\{relativePath.Replace(file.Name, file.Id.ToString())}";
+            string filePath2 = $"{fileUploadConfig.SaveFilePath}\\{username}\\archive\\{file.Id}";
+
+            File.Move(filePath, filePath2);
+        }
+
         public async Task<DownloadFileDTO> DownloadFile(Guid fileId, string username)
         {
             var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();

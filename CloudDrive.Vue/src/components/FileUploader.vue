@@ -8,6 +8,7 @@
         square
         flat
         bordered
+        multiple
         class="uploader q-mt-lg"
         @added="added"
         @removed="clearForm"

@@ -111,6 +111,9 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                     b.Property<long>("FileVersion")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 

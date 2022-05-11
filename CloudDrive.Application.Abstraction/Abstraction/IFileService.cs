@@ -6,5 +6,6 @@ namespace CloudDrive.Application
     {
         Task<UserFile> AddFile(AddUserFileVM file);
         Task<DownloadFileDTO> DownloadFile(Guid fileId, string username);
+        Task DeleteFile(string relativePath, string username);
     }
 }

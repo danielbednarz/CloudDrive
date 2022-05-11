@@ -26,7 +26,7 @@ namespace CloudDrive.WebAPI
         [HttpPost("uploadFile")]
         public async Task<IActionResult> UploadFile()
         {
-            var file = Request.Form.Files.FirstOrDefault();
+            var files = Request.Form.Files;
             var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (loggedUsername == null)
@@ -34,17 +34,36 @@ namespace CloudDrive.WebAPI
                 return NotFound("Błąd przy próbie znalezienia użytkownika");
             }
 
-            if (file.Length > 0)
+            foreach (var file in files)
             {
-                AddUserFileVM userFile = new()
+                if (file.Length > 0)
                 {
-                    File = file,
-                    Username = loggedUsername,
-                };
+                    AddUserFileVM userFile = new()
+                    {
+                        File = file,
+                        Username = loggedUsername,
+                    };
 
-                UserFile addedFile = await _fileService.AddFile(userFile);
-                await _hubContext.Clients.All.FileAdded(addedFile.Id, addedFile.Name);
+                    UserFile addedFile = await _fileService.AddFile(userFile);
+                    await _hubContext.Clients.All.FileAdded(addedFile.Id, addedFile.Name);
+                }
             }
+            
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpDelete("deleteFile")]
+        public async Task<IActionResult> DeleteFile(string relativePath)
+        {
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            await _fileService.DeleteFile(relativePath, loggedUsername);
 
             return Ok();
         }
