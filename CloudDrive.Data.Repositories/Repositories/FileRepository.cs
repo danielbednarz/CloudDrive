@@ -52,11 +52,12 @@ namespace CloudDrive.Data.Repositories
         public async Task<UserFile> MarkFileAsDeleted(string filePath, int? userId)
         {
             var file = await _context.Files
-                .Where(x => x.RelativePath == filePath && x.User.Id == userId)
+                .Where(x => x.RelativePath == filePath && x.User.Id == userId && x.IsDeleted == false)
                 .OrderByDescending(x => x.FileVersion)
                 .FirstOrDefaultAsync();
 
             file.IsDeleted = true;
+            file.RelativePath = null;
 
             _context.Files.Update(file);
             await _context.SaveChangesAsync();
