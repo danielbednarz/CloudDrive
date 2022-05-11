@@ -33,5 +33,36 @@ namespace FileWatcherWinForms
             }
             return string.Empty;
         }
+
+        public static async Task<string> UploadFile(string filePath, string token)
+        {
+            string allToken = "Bearer ";
+            allToken += token;
+            using (HttpClient client = new HttpClient())
+            {
+                //client.DefaultRequestHeaders.Add("Authorization", allToken);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                using (var formData = new MultipartFormDataContent())
+                {
+                    Stream fileStream = File.OpenRead(filePath);
+                    HttpContent fileStreamContent = new StreamContent(fileStream);
+                    //fileStreamContent.Headers.Add("Authorization", allToken);
+                    formData.Add(fileStreamContent, "file", "PlikTestowy.txt");
+                    //formData.Headers.Add("Authorization", allToken);
+                    using (HttpResponseMessage res = await client.PostAsync(baseURL + "File/uploadFile", formData))
+                    {
+                        using (HttpContent content = res.Content)
+                        {
+                            string data = await content.ReadAsStringAsync();
+                            if (data != null)
+                            {
+                                return data;
+                            }
+                        }
+                    }
+                }
+            }
+            return string.Empty;
+        }
     }
 }

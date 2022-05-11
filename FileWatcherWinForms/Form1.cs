@@ -163,6 +163,9 @@ namespace FileWatcherWinForms
                 button_edit.Visible = true;
                 observedPath.Visible = true;
                 fileSystemWatcher1.EnableRaisingEvents = true;
+                var res = await RestHelper.UploadFile("E:\\PlikTestowy.txt", userDTO.token);
+                Debug.WriteLine("Witaj");
+                Debug.WriteLine(res);
             }
         }
 
