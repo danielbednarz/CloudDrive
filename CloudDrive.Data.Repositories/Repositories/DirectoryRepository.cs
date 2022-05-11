@@ -19,7 +19,8 @@ namespace CloudDrive.Data.Repositories
             {
                 Name = model.Name,
                 RelativePath = model.GeneratedPath,
-                UserId = model.UserId.Value
+                UserId = model.UserId.Value,
+                ParentDirectoryId = model.ParentDirectoryId,
             });
 
             _context.SaveChanges();
