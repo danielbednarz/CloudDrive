@@ -2,8 +2,10 @@
 using CloudDrive.Application.Abstraction;
 using CloudDrive.Data.Abstraction;
 using CloudDrive.Domain;
+using CloudDrive.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -12,10 +14,12 @@ namespace CloudDrive.WebAPI.Controllers
     public class UsersController : AppController
     {
         public IUserService UserService { get; set; }
+        private readonly IHubContext<FileHub> _hubContext;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, IHubContext<FileHub> hubContext)
         {
             UserService = userService;
+            _hubContext = hubContext;
         }
 
         [HttpPost("register")]
@@ -43,7 +47,14 @@ namespace CloudDrive.WebAPI.Controllers
 
             var loggedUser = UserService.Login(user, loginVM);
 
-            return loggedUser == null ? Unauthorized("Nieprawidłowe hasło") : loggedUser;
+            if (loggedUser != null)
+            {
+                return loggedUser;
+            }
+            else
+            {
+                return Unauthorized("Nieprawidłowe hasło");
+            }
         }
 
         [Authorize]

@@ -13,9 +13,9 @@ namespace CloudDrive.WebAPI
     {
         private readonly IFileService _fileService;
         private readonly IDirectoryService _directoryService;
-        private readonly IHubContext<FileHub, IFileHub> _hubContext;
+        private readonly IHubContext<FileHub> _hubContext;
 
-        public FileController(IFileService fileService, IDirectoryService directoryService, IHubContext<FileHub, IFileHub> hubContext)
+        public FileController(IFileService fileService, IDirectoryService directoryService, IHubContext<FileHub> hubContext)
         {
             _fileService = fileService;
             _directoryService = directoryService;
@@ -43,7 +43,7 @@ namespace CloudDrive.WebAPI
                 };
 
                 UserFile addedFile = await _fileService.AddFile(userFile);
-                await _hubContext.Clients.All.FileAdded(addedFile.Id, addedFile.Name);
+                await _hubContext.Clients.Group(loggedUsername).SendAsync("FileAdded", default, addedFile.Name);
             }
 
             return Ok();

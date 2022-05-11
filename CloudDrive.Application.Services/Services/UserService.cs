@@ -67,7 +67,7 @@ namespace CloudDrive.Application
                 AddDirectoryVM model = new()
                 { 
                     Name = username,
-                    UserChosenPath = username,
+                    GeneratedPath = username,
                     UserId = userId
                 };
 
