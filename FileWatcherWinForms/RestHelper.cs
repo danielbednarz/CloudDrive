@@ -34,7 +34,7 @@ namespace FileWatcherWinForms
             return string.Empty;
         }
 
-        public static async Task<string> UploadFile(string filePath, string token)
+        public static async Task<string> UploadFile(string filePath, string token, string fileName)
         {
             string allToken = "Bearer ";
             allToken += token;

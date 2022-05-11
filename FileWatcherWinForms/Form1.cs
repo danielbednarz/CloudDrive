@@ -16,6 +16,8 @@ namespace FileWatcherWinForms
     
     public partial class CloudDrive : Form
     {
+        string currentUser;
+        string currentTokenUser;
         public CloudDrive()
         {
             InitializeComponent();
@@ -73,9 +75,11 @@ namespace FileWatcherWinForms
 
         }
 
-        private void fileSystemWatcher1_Created(object sender, FileSystemEventArgs e)
+        private async void fileSystemWatcher1_Created(object sender, FileSystemEventArgs e)
         {
             string value = $"Created: {e.FullPath}";
+            String filename = Path.GetFileName(e.FullPath);
+            var res = await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename);
             SaveLog(value);
 
         }
@@ -163,9 +167,11 @@ namespace FileWatcherWinForms
                 button_edit.Visible = true;
                 observedPath.Visible = true;
                 fileSystemWatcher1.EnableRaisingEvents = true;
-                var res = await RestHelper.UploadFile("E:\\PlikTestowy.txt", userDTO.token);
-                Debug.WriteLine("Witaj");
-                Debug.WriteLine(res);
+                currentUser = userDTO.username;
+                currentTokenUser = userDTO.token;
+                //var res = await RestHelper.UploadFile("E:\\PlikTestowy.txt", userDTO.token);
+                //Debug.WriteLine("Witaj");
+                //Debug.WriteLine(res);
             }
         }
 
