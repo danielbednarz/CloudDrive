@@ -13,7 +13,7 @@ namespace CloudDrive.Data.Repositories
         {
         }
 
-        public async Task<UserFile> AddFile(AddUserFileVM file)
+        public async Task<UserFile> AddFile(AddUserFileVM file, UserDirectory userDirectory)
         {
             var fileName = file.File.FileName;
             long fileVersion = 0;
@@ -26,14 +26,15 @@ namespace CloudDrive.Data.Repositories
                 fileVersion += 1;
             }
 
-            UserFile userFile = new UserFile()
+            UserFile userFile = new()
             {
                 Name = fileName,
                 Size = file.File.Length,
                 FileVersion = fileVersion,
                 CreatedDate = DateTime.Now,
                 ContentType = file.File.ContentType,
-                UserId = file.UserId.Value
+                UserId = file.UserId.Value,
+                DirectoryId = userDirectory.Id
             };
 
             await _context.Files.AddAsync(userFile);

@@ -9,13 +9,15 @@ namespace CloudDrive.Application
     {
         private readonly IFileRepository _fileRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IDirectoryRepository _directoryRepository;
         private readonly IConfiguration _config;
 
-        public FileService(IFileRepository fileRepository, IUserRepository userRepository, IConfiguration config)
+        public FileService(IFileRepository fileRepository, IUserRepository userRepository, IConfiguration config, IDirectoryRepository directoryRepository)
         {
             _fileRepository = fileRepository;
             _userRepository = userRepository;
             _config = config;
+            _directoryRepository = directoryRepository;
         }
 
         public async Task<UserFile> AddFile(AddUserFileVM file)
@@ -24,11 +26,10 @@ namespace CloudDrive.Application
 
             file.UserId = _userRepository.FirstOrDefault(x => x.Username == file.Username)?.Id;
 
-            UserFile userFile = await _fileRepository.AddFile(file);
-            
-            var fileName = userFile.Id.ToString();
+            UserDirectory userDirectory = _directoryRepository.FirstOrDefault(x => x.UserId == file.UserId && x.ParentDirectoryId == null);
+            UserFile userFile = await _fileRepository.AddFile(file, userDirectory);
 
-            using var stream = File.Create($"{fileUploadConfig.SaveFilePath}\\{file.Username}\\{fileName}");
+            using var stream = File.Create($"{fileUploadConfig.SaveFilePath}\\{file.Username}\\{userFile.Id.ToString()}");
             await file.File.CopyToAsync(stream);
 
             return userFile;

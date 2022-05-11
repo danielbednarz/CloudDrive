@@ -12,12 +12,14 @@ namespace CloudDrive.Application
         private readonly IConfiguration _config;
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
+        private readonly IDirectoryRepository _directoryRepository;
 
-        public UserService(IConfiguration config, IUserRepository userRepository, ITokenService tokenService)
+        public UserService(IConfiguration config, IUserRepository userRepository, ITokenService tokenService, IDirectoryRepository directoryRepository)
         {
             _config = config;
             _userRepository = userRepository;
             _tokenService = tokenService;
+            _directoryRepository = directoryRepository;
         }
 
         public Task<bool> IsUserExists(string username)
@@ -44,7 +46,7 @@ namespace CloudDrive.Application
             _userRepository.Add(user);
             await _userRepository.SaveAsync();
 
-            CreateDirectoryForNewUser(user.Username);
+            await CreateDirectoryForNewUser(user.Username, user.Id);
 
             return new UserDTO
             {
@@ -53,14 +55,24 @@ namespace CloudDrive.Application
             };
         }
 
-        private void CreateDirectoryForNewUser(string username)
+        private async Task CreateDirectoryForNewUser(string username, int userId)
         {
             var mainPath = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>().SaveFilePath;
             var pathForUser = Path.Combine(mainPath, username);
 
             try
             {
-                var result = Directory.CreateDirectory(pathForUser);
+                Directory.CreateDirectory(pathForUser);
+
+                AddDirectoryVM model = new()
+                { 
+                    Name = username,
+                    UserChosenPath = username,
+                    UserId = userId
+                };
+
+                await _directoryRepository.AddDirectory(model);
+
             }
             catch (Exception ex)
             {
