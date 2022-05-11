@@ -88,6 +88,7 @@ const linksList = [
 
 import { mapWritableState } from "pinia";
 import { useAuthenticationStore } from "../stores/authentication.js";
+import { connectToHub } from "../hubs/file-hub";
 
 export default {
   name: "MainLayout",
@@ -129,16 +130,12 @@ export default {
     },
   },
   mounted() {
-    this.$mitt.on("file-added", this.onFileAdded);
-  },
-  beforeUnmount() {
-    this.$mitt.off("file-added", this.onFileAdded);
-  },
-  mounted() {
     if (localStorage.user) {
       let localStorageUser = JSON.parse(localStorage.user);
       this.currentUser.username = localStorageUser.username;
       this.currentUser.token = localStorageUser.token;
+
+      connectToHub(localStorageUser.username, this.$q);
     }
   },
 };

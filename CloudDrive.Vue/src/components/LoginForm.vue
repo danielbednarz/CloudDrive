@@ -47,7 +47,8 @@
 
 <script>
 import { useAuthenticationStore } from "../stores/authentication.js";
-import { mapActions, mapWritableState } from "pinia";
+import { mapActions, mapState, mapWritableState } from "pinia";
+import { connectToHub } from "../hubs/file-hub";
 
 export default {
   name: "LoginForm",
@@ -64,6 +65,7 @@ export default {
   },
   computed: {
     ...mapWritableState(useAuthenticationStore, ["form"]),
+    ...mapState(useAuthenticationStore, ["currentUser"]),
   },
   methods: {
     ...mapActions(useAuthenticationStore, ["clearForm", "login"]),
@@ -74,6 +76,9 @@ export default {
     },
     async tryLogin() {
       await this.login();
+
+      connectToHub(this.currentUser.username, this.$q);
+
       this.closePopover();
     },
   },
