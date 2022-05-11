@@ -64,6 +64,22 @@ namespace CloudDrive.WebAPI
 
             return Ok();
         }
+        
+        [Authorize]
+        [HttpGet("getDirectoriesToSelectList")]
+        public async Task<IActionResult> GetDirectoriesToSelectList()
+        {
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            List<DirectorySelectBoxVM> list = await _directoryService.GetDirectoriesToSelectList(loggedUsername);
+
+            return Ok(list);
+        }
 
         [Authorize]
         [HttpGet("downloadFile")]
