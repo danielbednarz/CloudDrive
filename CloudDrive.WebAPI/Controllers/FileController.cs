@@ -23,6 +23,23 @@ namespace CloudDrive.WebAPI
         }
 
         [Authorize]
+        [HttpGet("getUserFiles")]
+        public async Task<IActionResult> GetUserFiles()
+        {
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            List<FileDataDTO> list = await _fileService.GetUserFiles(loggedUsername);
+
+            return Ok(list);
+        }
+
+
+        [Authorize]
         [HttpPost("uploadFile")]
         public async Task<IActionResult> UploadFile()
         {

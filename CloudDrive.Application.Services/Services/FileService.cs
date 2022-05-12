@@ -20,6 +20,12 @@ namespace CloudDrive.Application
             _directoryRepository = directoryRepository;
         }
 
+        public async Task<List<FileDataDTO>> GetUserFiles(string username)
+        {
+            AppUser user = _userRepository.FirstOrDefault(x => x.Username == username) ?? throw new Exception("Nie znaleziono uzytkownika");
+            return await _fileRepository.GetUserFiles(user.Id);
+        }
+
         public async Task<UserFile> AddFile(AddUserFileVM file)
         {
             var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();

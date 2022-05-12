@@ -27,6 +27,10 @@ export const useAuthenticationStore = defineStore({
         localStorage.setItem("user", JSON.stringify(this.user));
       });
     },
+    logout() {
+      this.currentUser.username = "";
+      this.currentUser.token = "";
+    },
     clearForm() {
       this.form = [];
     },

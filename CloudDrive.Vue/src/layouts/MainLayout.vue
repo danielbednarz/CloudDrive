@@ -14,7 +14,16 @@
         <q-toolbar-title
           ><i class="fa-solid fa-cloud q-mx-xs"></i> CloudDrive
         </q-toolbar-title>
-        <div v-if="currentUser.token">Witaj, {{ currentUser.username }}!</div>
+        <div v-if="currentUser.token">
+          Witaj, {{ currentUser.username }}!
+          <q-btn
+            flat
+            round
+            icon="fa-solid fa-arrow-right-from-bracket"
+            aria-label="Wyloguj się"
+            @click="tryLogout"
+          />
+        </div>
         <div v-else>
           <q-btn
             flat
@@ -86,7 +95,7 @@ const linksList = [
   },
 ];
 
-import { mapWritableState } from "pinia";
+import { mapActions, mapWritableState } from "pinia";
 import { useAuthenticationStore } from "../stores/authentication.js";
 import { connectToHub } from "../hubs/file-hub";
 
@@ -108,6 +117,7 @@ export default {
     ...mapWritableState(useAuthenticationStore, ["currentUser"]),
   },
   methods: {
+    ...mapActions(useAuthenticationStore, ["logout"]),
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen;
     },
@@ -126,6 +136,13 @@ export default {
       this.$q.notify({
         type: "info",
         message: `Z innego urządzenia został dodany nowy plik ${fileName}`,
+      });
+    },
+    tryLogout() {
+      this.logout();
+      this.$q.notify({
+        type: "positive",
+        message: `Wylogowano pomyślnie!`,
       });
     },
   },

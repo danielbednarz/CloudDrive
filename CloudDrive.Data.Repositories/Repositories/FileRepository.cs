@@ -13,6 +13,21 @@ namespace CloudDrive.Data.Repositories
         {
         }
 
+        public async Task<List<FileDataDTO>> GetUserFiles(int userId)
+        {
+            return await _context.Files.Where(x => x.UserId == userId).Select(x => new FileDataDTO
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Size = x.Size,
+                FileVersion = x.FileVersion,
+                CreatedDate = x.CreatedDate,
+                UpdatedDate = x.UpdatedDate,
+                RelativePath = x.RelativePath,
+                DirectoryId = x.DirectoryId
+            }).ToListAsync();
+        }
+        
         public async Task<UserFile> AddFile(AddUserFileVM file, UserDirectory userDirectory)
         {
             var fileName = file.File.FileName;

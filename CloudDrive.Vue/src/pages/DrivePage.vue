@@ -38,6 +38,9 @@
             "
           />
         </transition>
+        <div>
+          <files-grid />
+        </div>
       </main-container>
     </q-page>
   </transition>
@@ -46,6 +49,7 @@
 <script>
 import MainContainer from "../components/MainContainer";
 import DirectoryAddForm from "../components/DirectoryAddForm";
+import FilesGrid from "../components/FilesGrid";
 
 export default {
   name: "DrivePage",
@@ -57,6 +61,7 @@ export default {
   components: {
     MainContainer,
     DirectoryAddForm,
+    FilesGrid,
   },
   methods: {
     getButtonLabel() {

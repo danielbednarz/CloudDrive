@@ -6,6 +6,7 @@ using CloudDrive.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -14,7 +15,7 @@ namespace CloudDrive.WebAPI.Controllers
     public class UsersController : AppController
     {
         public IUserService UserService { get; set; }
-        private readonly IHubContext<FileHub> _hubContext;
+        public readonly IHubContext<FileHub> _hubContext;
 
         public UsersController(IUserService userService, IHubContext<FileHub> hubContext)
         {

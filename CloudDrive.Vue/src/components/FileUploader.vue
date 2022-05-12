@@ -1,37 +1,34 @@
 <template>
-  <main-container title="Dodaj plik">
-    <div class="row justify-center">
-      <q-uploader
-        url="https://localhost:44390/api/File/uploadFile"
-        color="secondary"
-        text-color="dark"
-        square
-        flat
-        bordered
-        multiple
-        class="uploader q-mt-lg"
-        @added="added"
-        @removed="clearForm"
-        @uploading="onUploading"
-        @uploaded="onUploaded"
-        @failed="onError"
-        :headers="[
-          {
-            name: 'Authorization',
-            value: `Bearer ${currentUser.token}`,
-          },
-        ]"
-        v-if="currentUser"
-      />
-    </div>
-  </main-container>
+  <div class="row justify-center">
+    <q-uploader
+      url="https://localhost:44390/api/File/uploadFile"
+      color="secondary"
+      text-color="dark"
+      square
+      flat
+      bordered
+      multiple
+      class="uploader q-mt-lg"
+      @added="added"
+      @removed="clearForm"
+      @uploading="onUploading"
+      @uploaded="onUploaded"
+      @failed="onError"
+      :headers="[
+        {
+          name: 'Authorization',
+          value: `Bearer ${currentUser.token}`,
+        },
+      ]"
+      v-if="currentUser"
+    />
+  </div>
 </template>
 <script>
 import { useUploadStore } from "../stores/upload.js";
 import { useAuthenticationStore } from "../stores/authentication.js";
 import { mapActions, mapWritableState, mapState } from "pinia";
 import { useQuasar } from "quasar";
-import MainContainer from "./MainContainer";
 
 export default {
   name: "UploadPage",
@@ -69,9 +66,6 @@ export default {
         message: "Wystąpił błąd podczas dodawania pliku!",
       });
     },
-  },
-  components: {
-    MainContainer,
   },
   beforeUnmount() {
     this.clearForm();

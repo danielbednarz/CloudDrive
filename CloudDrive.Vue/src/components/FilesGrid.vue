@@ -1,0 +1,94 @@
+<template>
+  <div class="q-pa-md">
+    <q-table
+      grid
+      title="Pliki"
+      :rows="files"
+      :columns="columns"
+      row-key="id"
+      v-if="files"
+    >
+      <template v-slot:item="props">
+        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
+          <q-card class="file-card bg-secondary text-black">
+            <q-card-section class="text-center">
+              <i class="fa-solid fa-file text-h5"></i>
+              <div class="text-body2">{{ props.row.name }}</div>
+            </q-card-section>
+            <q-separator />
+            <q-card-section
+              class="flex flex-center"
+              :style="{ fontSize: 10 + props.row.size / 200000 + 'px' }"
+            >
+              <div>{{ (props.row.size / 1000000).toFixed(2) }} MB</div>
+            </q-card-section>
+          </q-card>
+        </div>
+      </template>
+      <!-- <template v-slot:top-right>
+        <q-input
+          borderless
+          dense
+          debounce="300"
+          v-model="filter"
+          placeholder="Search"
+        >
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </template> -->
+    </q-table>
+  </div>
+</template>
+
+<script>
+import { useDirectoryStore } from "../stores/directory.js";
+import { useFileStore } from "../stores/file.js";
+import { mapActions } from "pinia";
+
+export default {
+  name: "FileGrid",
+  data() {
+    return {
+      directories: [],
+      files: [],
+      columns: [
+        {
+          name: "Name",
+          field: (row) => row.name,
+          format: (val) => `${val}`,
+        },
+        {
+          name: "Size",
+          field: (row) => row.size,
+          format: (val) => `${val}`,
+        },
+      ],
+    };
+  },
+  computed: {},
+  methods: {
+    ...mapActions(useDirectoryStore, ["getDirectoriesToSelectList"]),
+    ...mapActions(useFileStore, ["getUserFiles"]),
+  },
+  mounted() {
+    this.getUserFiles().then((response) => {
+      this.files = response;
+    });
+    this.getDirectoriesToSelectList().then((response) => {
+      this.directories = response;
+    });
+  },
+};
+</script>
+<style lang="scss" scoped>
+.file-card {
+  opacity: 0.8;
+  transition: 0.3s;
+}
+.file-card:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+</style>
