@@ -49,10 +49,10 @@ namespace CloudDrive.Application
 
             UserFile file = await _fileRepository.MarkFileAsDeleted(relativePath, userId);
 
-            string filePath = $"{fileUploadConfig.SaveFilePath}\\{relativePath.Replace(file.Name, file.Id.ToString())}";
-            string filePath2 = $"{fileUploadConfig.SaveFilePath}\\{username}\\archive\\{file.Id}";
+            string oldPath = $"{fileUploadConfig.SaveFilePath}\\{relativePath.Replace(file.Name, file.Id.ToString())}";
+            string newPath = $"{fileUploadConfig.SaveFilePath}\\{username}\\archive\\{file.Id}";
 
-            File.Move(filePath, filePath2);
+            File.Move(oldPath, newPath);
         }
 
         public async Task<DownloadFileDTO> DownloadFile(Guid fileId, string username)

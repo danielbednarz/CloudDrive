@@ -72,7 +72,7 @@ namespace CloudDrive.Data.Repositories
                 .FirstOrDefaultAsync();
 
             file.IsDeleted = true;
-            file.RelativePath = null;
+            file.RelativePath = @$"archive\{file.Name}";
 
             _context.Files.Update(file);
             await _context.SaveChangesAsync();
