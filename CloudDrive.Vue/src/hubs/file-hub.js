@@ -8,8 +8,8 @@ const connectToHub = (username, q) => {
 
   connection.on("FileAdded", (id, fileName) => {
     q.notify({
-      type: "info",
-      message: `Z innego urządzenia został dodany nowy plik ${fileName}`,
+      type: "positive",
+      message: `Plik ${fileName} został dodany pomyślnie!`,
     });
   });
 

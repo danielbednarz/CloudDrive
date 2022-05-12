@@ -1,43 +1,46 @@
 <template>
-  <q-form class="q-gutter-md" @submit="tryAdd">
+  <div class="section-container">
     <p class="text-h5 q-mt-lg q-mb-xs">Dodawanie nowego folderu</p>
-    <div class="row q-py-lg">
-      <div class="column q-mx-md form-field">
-        <q-input
-          filled
-          v-model="form.Name"
-          label="Nazwa folderu"
-          lazy-rules
-          color="secondary"
-          dark
-          :rules="[
-            (val) => (val && val.length > 0) || 'Nazwa folderu jest wymagana!',
-          ]"
-          dense
-        />
+    <q-form class="q-gutter-md" @submit="tryAdd">
+      <div class="row q-py-lg">
+        <div class="column q-mx-md form-field">
+          <q-input
+            filled
+            v-model="form.Name"
+            label="Nazwa folderu"
+            lazy-rules
+            color="secondary"
+            dark
+            :rules="[
+              (val) =>
+                (val && val.length > 0) || 'Nazwa folderu jest wymagana!',
+            ]"
+            dense
+          />
+        </div>
+        <div class="column q-mx-md form-field">
+          <q-select
+            filled
+            v-model="form.ParentDirectoryId"
+            label="Folder nadrzędny"
+            color="secondary"
+            dark
+            :options="directories"
+            option-label="text"
+            option-value="value"
+            emit-value
+            map-options
+            dense
+            clearable
+          />
+        </div>
+        <q-space />
+        <div class="column q-mx-md">
+          <q-btn label="Dodaj" text-color="secondary" outline type="submit" />
+        </div>
       </div>
-      <div class="column q-mx-md form-field">
-        <q-select
-          filled
-          v-model="form.ParentDirectoryId"
-          label="Folder nadrzędny"
-          color="secondary"
-          dark
-          :options="directories"
-          option-label="text"
-          option-value="value"
-          emit-value
-          map-options
-          dense
-          clearable
-        />
-      </div>
-      <q-space />
-      <div class="column q-mx-md">
-        <q-btn label="Dodaj" text-color="secondary" outline type="submit" />
-      </div>
-    </div>
-  </q-form>
+    </q-form>
+  </div>
 </template>
 
 <script>
@@ -80,12 +83,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.container-register {
-  width: 350px;
-  border-top: 4px solid $secondary;
-  background-color: $dark;
-}
 .form-field {
-  width: 36%;
+  width: 40%;
 }
 </style>

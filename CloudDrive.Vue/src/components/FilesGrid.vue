@@ -1,31 +1,36 @@
 <template>
-  <div class="q-pa-md">
-    <q-table
-      grid
-      title="Pliki"
-      :rows="files"
-      :columns="columns"
-      row-key="id"
-      v-if="files"
-    >
-      <template v-slot:item="props">
-        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
-          <q-card class="file-card bg-secondary text-black">
-            <q-card-section class="text-center">
-              <i class="fa-solid fa-file text-h5"></i>
-              <div class="text-body2">{{ props.row.name }}</div>
-            </q-card-section>
-            <q-separator />
-            <q-card-section
-              class="flex flex-center"
-              :style="{ fontSize: 10 + props.row.size / 200000 + 'px' }"
-            >
-              <div>{{ (props.row.size / 1000000).toFixed(2) }} MB</div>
-            </q-card-section>
-          </q-card>
-        </div>
-      </template>
-      <!-- <template v-slot:top-right>
+  <div class="section-container">
+    <p class="text-h5 q-mt-lg q-mb-xs">Pliki</p>
+    <div class="q-pa-md">
+      <q-table
+        grid
+        :rows="files"
+        :columns="columns"
+        row-key="id"
+        v-if="files"
+        no-data-label="Brak plików"
+        no-results-label="Brak danych"
+        loading-label="Ładowanie..."
+        rows-per-page-label="Wielkość strony"
+      >
+        <template v-slot:item="props">
+          <div class="q-pa-xs col-2">
+            <q-card class="file-card bg-secondary text-black">
+              <q-card-section class="text-center">
+                <i class="fa-solid fa-file text-h5"></i>
+                <div class="text-body2">{{ props.row.name }}</div>
+              </q-card-section>
+              <q-separator />
+              <q-card-section
+                class="flex flex-center"
+                :style="{ fontSize: 12 + props.row.size / 250000 + 'px' }"
+              >
+                <div>{{ (props.row.size / 1000000).toFixed(2) }} MB</div>
+              </q-card-section>
+            </q-card>
+          </div>
+        </template>
+        <!-- <template v-slot:top-right>
         <q-input
           borderless
           dense
@@ -38,7 +43,8 @@
           </template>
         </q-input>
       </template> -->
-    </q-table>
+      </q-table>
+    </div>
   </div>
 </template>
 

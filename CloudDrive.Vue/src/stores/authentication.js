@@ -23,16 +23,19 @@ export const useAuthenticationStore = defineStore({
     },
     async register() {
       await api.post("/Users/register", this.form).then((response) => {
-        this.user = response.data;
-        localStorage.setItem("user", JSON.stringify(this.user));
+        this.currentUser.username = response.data.username;
+        this.currentUser.token = response.data.token;
+        localStorage.setItem("user", JSON.stringify(response.data));
       });
     },
     logout() {
       this.currentUser.username = "";
       this.currentUser.token = "";
+      localStorage.removeItem("user");
     },
     clearForm() {
-      this.form = [];
+      this.form.Username = "";
+      this.form.Password = "";
     },
   },
 });

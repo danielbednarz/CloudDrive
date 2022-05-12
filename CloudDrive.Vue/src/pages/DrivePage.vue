@@ -36,9 +36,10 @@
                 isAddFolderMenuOpen = false;
               }
             "
+            class="q-mt-md"
           />
         </transition>
-        <div>
+        <div class="q-mt-md">
           <files-grid />
         </div>
       </main-container>

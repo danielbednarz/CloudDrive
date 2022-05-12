@@ -12,7 +12,6 @@
       @added="added"
       @removed="clearForm"
       @uploading="onUploading"
-      @uploaded="onUploaded"
       @failed="onError"
       :headers="[
         {
@@ -51,13 +50,7 @@ export default {
         type: "info",
         spinner: true,
         message: "Dodaję plik...",
-        timeout: 2500,
-      });
-    },
-    onUploaded() {
-      this.$q.notify({
-        type: "positive",
-        message: "Plik został dodany pomyślnie!",
+        timeout: 2000,
       });
     },
     onError() {
