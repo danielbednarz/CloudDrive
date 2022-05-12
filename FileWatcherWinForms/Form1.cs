@@ -89,6 +89,13 @@ namespace FileWatcherWinForms
             SaveLog($"Deleted: {e.FullPath}");
         }
 
+        private void fileSystemWatcher1_Renamed(object sender, RenamedEventArgs e)
+        {
+            SaveLog($"Renamed:");
+            SaveLog($"    Old: {e.OldFullPath}");
+            SaveLog($"    New: {e.FullPath}");
+        }
+
         private void fileSystemWatcher1_Error(object sender, ErrorEventArgs e) =>
             PrintException(e.GetException());
 
@@ -102,13 +109,6 @@ namespace FileWatcherWinForms
                 SaveLog(" ");
                 PrintException(ex.InnerException);
             }
-        }
-
-        private void fileSystemWatcher1_Renamed(object sender, RenamedEventArgs e)
-        {
-            SaveLog($"Renamed:");
-            SaveLog($"    Old: {e.OldFullPath}");
-            SaveLog($"    New: {e.FullPath}");
         }
 
         private void button_edit_Click(object sender, EventArgs e)
@@ -147,18 +147,24 @@ namespace FileWatcherWinForms
             password.PasswordChar = '*';
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             username.Select();
+            //this.StartPosition = FormStartPosition.CenterParent;
+
         }
 
         private async void login_Click(object sender, EventArgs e)
         {
             User user = new User();
+            UserDTO userDTO=null;
             user.username = username.Text;
             user.password = password.Text;
             var response = await RestHelper.Login(user);
             //Debug.WriteLine(response);
-            UserDTO userDTO = JsonSerializer.Deserialize<UserDTO>(response);
+            if (!response.Contains("Nieprawid³owa nazwa u¿ytkownika"))
+            {
+                userDTO = JsonSerializer.Deserialize<UserDTO>(response);
+            }
             //Debug.WriteLine(userDTO.token);
-            if(userDTO.token != null && userDTO.username != null)
+            if (userDTO != null && userDTO.token != null && userDTO.username != null)
             {
                 nameApp.Visible = false;
                 username.Visible = false;
@@ -173,6 +179,9 @@ namespace FileWatcherWinForms
                 //Debug.WriteLine("Witaj");
                 //Debug.WriteLine(res);
             }
+            else MessageBox.Show(this, "B³êdna nazwa u¿ytkownika, lub has³o.");
+
+
         }
 
         private void label1_Click(object sender, EventArgs e)
