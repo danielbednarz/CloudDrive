@@ -80,6 +80,10 @@ export default {
       connectToHub(this.currentUser.username, this.$q);
 
       this.closePopover();
+      this.$q.notify({
+        type: "info",
+        message: `Zalogowano pomyślnie`,
+      });
     },
   },
   mounted() {

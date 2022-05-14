@@ -21,5 +21,21 @@ export const useFileStore = defineStore({
           });
       });
     },
+
+    async deleteFile(relativePath) {
+      if (
+        authenticationStore.currentUser &&
+        authenticationStore.currentUser.token
+      ) {
+        await api.delete("/File/deleteFile", {
+          headers: {
+            Authorization: `Bearer ${authenticationStore.currentUser.token}`,
+          },
+          params: {
+            relativePath: relativePath,
+          },
+        });
+      }
+    },
   },
 });

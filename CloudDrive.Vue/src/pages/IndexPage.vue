@@ -20,7 +20,8 @@
               class="q-mr-md"
             />
           </div> -->
-          <div>
+          <div v-if="loggedInUser.token"></div>
+          <div v-else>
             <q-btn
               color="secondary"
               text-color="black"
@@ -45,7 +46,7 @@
 <script>
 import MainContainer from "../components/MainContainer";
 import RegisterForm from "../components/RegisterForm";
-import { mapState } from "pinia";
+import { mapState, mapWritableState } from "pinia";
 import { useAuthenticationStore } from "../stores/authentication.js";
 
 export default {
@@ -55,12 +56,14 @@ export default {
     RegisterForm,
   },
   computed: {
-    ...mapState(useAuthenticationStore, ["user"]),
+    ...mapState(useAuthenticationStore, ["currentUser"]),
+    loggedInUser() {
+      return this.currentUser;
+    },
   },
   data() {
     return {
       isRegisterPopoverVisible: false,
-      currentUser: JSON.parse(localStorage.getItem("user")),
     };
   },
   methods: {

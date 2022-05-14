@@ -35,10 +35,5 @@ export default route(function (/* { store, ssrContext } */) {
     ),
   });
 
-  // Router.beforeEach((to, from, next) => {
-  //   if (to.name == "upload") next();
-  //   else next({ name: "upload" });
-  // });
-
   return Router;
 });
