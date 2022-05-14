@@ -12,6 +12,7 @@
         public string RelativePath { get; set; }
         public int UserId { get; set; }
         public Guid? DirectoryId { get; set; }
+        public bool IsDeleted { get; set; }
         public virtual AppUser User { get; set; }
         public virtual UserDirectory Directory { get; set; }
         public virtual ICollection<FileOperationsLogs> FileOperationsLogs { get; set; }

@@ -3,9 +3,10 @@ using CloudDrive.Domain;
 
 namespace CloudDrive.Data.Abstraction
 {
-    public interface IDirectoryRepository
+    public interface IDirectoryRepository : IGenericRepository<UserDirectory>
     {
         Task AddDirectory(AddDirectoryVM model);
         bool IsDirectoryUnique(string path);
+        Task<List<DirectorySelectBoxVM>> GetDirectoriesToSelectList(int userId);
     }
 }

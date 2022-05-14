@@ -12,12 +12,14 @@ namespace CloudDrive.Application
         private readonly IConfiguration _config;
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
+        private readonly IDirectoryRepository _directoryRepository;
 
-        public UserService(IConfiguration config, IUserRepository userRepository, ITokenService tokenService)
+        public UserService(IConfiguration config, IUserRepository userRepository, ITokenService tokenService, IDirectoryRepository directoryRepository)
         {
             _config = config;
             _userRepository = userRepository;
             _tokenService = tokenService;
+            _directoryRepository = directoryRepository;
         }
 
         public Task<bool> IsUserExists(string username)
@@ -44,7 +46,7 @@ namespace CloudDrive.Application
             _userRepository.Add(user);
             await _userRepository.SaveAsync();
 
-            CreateDirectoryForNewUser(user.Username);
+            await CreateDirectoriesForNewUser(user);
 
             return new UserDTO
             {
@@ -53,14 +55,46 @@ namespace CloudDrive.Application
             };
         }
 
-        private void CreateDirectoryForNewUser(string username)
+        private async Task CreateDirectoriesForNewUser(AppUser user)
+        {
+            await CreateDirectory(user.Username, user.Id);                //add main directory
+            await CreateDirectory("archive", user.Id, user.Username);     //add archive directory for deleted files
+        }
+
+        private async Task CreateDirectory(string directoryName, int userId, string path = null)
         {
             var mainPath = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>().SaveFilePath;
-            var pathForUser = Path.Combine(mainPath, username);
+
+            string pathForUser;
+            AddDirectoryVM model;
+
+            if (path == null)
+            {
+                pathForUser = Path.Combine(mainPath, directoryName);
+                model = new()
+                {
+                    Name = directoryName,
+                    GeneratedPath = directoryName,
+                    UserId = userId,
+                    ParentDirectoryId = null
+                };
+            }
+            else
+            {
+                pathForUser = Path.Combine(mainPath, path, directoryName);
+                model = new()
+                {
+                    Name = directoryName,
+                    GeneratedPath = @$"{path}\{directoryName}",
+                    UserId = userId,
+                    ParentDirectoryId = _directoryRepository.FirstOrDefault(x => x.UserId == userId && x.ParentDirectoryId == null && x.Name == x.User.Username).Id,
+                };
+            }
 
             try
             {
-                var result = Directory.CreateDirectory(pathForUser);
+                await _directoryRepository.AddDirectory(model);
+                Directory.CreateDirectory(pathForUser);
             }
             catch (Exception ex)
             {

@@ -65,7 +65,8 @@
 
 <script>
 import { useAuthenticationStore } from "../stores/authentication.js";
-import { mapActions, mapWritableState } from "pinia";
+import { mapActions, mapWritableState, mapState } from "pinia";
+import { connectToHub } from "../hubs/file-hub";
 
 export default {
   name: "RegisterForm",
@@ -83,6 +84,7 @@ export default {
   },
   computed: {
     ...mapWritableState(useAuthenticationStore, ["form"]),
+    ...mapState(useAuthenticationStore, ["currentUser"]),
   },
   methods: {
     ...mapActions(useAuthenticationStore, ["clearForm", "register"]),
@@ -93,6 +95,7 @@ export default {
     },
     async tryRegister() {
       await this.register();
+      connectToHub(this.currentUser.username, this.$q);
       this.closePopover();
     },
   },

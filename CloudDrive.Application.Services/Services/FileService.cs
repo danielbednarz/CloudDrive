@@ -9,13 +9,21 @@ namespace CloudDrive.Application
     {
         private readonly IFileRepository _fileRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IDirectoryRepository _directoryRepository;
         private readonly IConfiguration _config;
 
-        public FileService(IFileRepository fileRepository, IUserRepository userRepository, IConfiguration config)
+        public FileService(IFileRepository fileRepository, IUserRepository userRepository, IConfiguration config, IDirectoryRepository directoryRepository)
         {
             _fileRepository = fileRepository;
             _userRepository = userRepository;
             _config = config;
+            _directoryRepository = directoryRepository;
+        }
+
+        public async Task<List<FileDataDTO>> GetUserFiles(string username)
+        {
+            AppUser user = _userRepository.FirstOrDefault(x => x.Username == username) ?? throw new Exception("Nie znaleziono uzytkownika");
+            return await _fileRepository.GetUserFiles(user.Id);
         }
 
         public async Task<UserFile> AddFile(AddUserFileVM file)
@@ -24,14 +32,27 @@ namespace CloudDrive.Application
 
             file.UserId = _userRepository.FirstOrDefault(x => x.Username == file.Username)?.Id;
 
-            UserFile userFile = await _fileRepository.AddFile(file);
-            
-            var fileName = userFile.Id.ToString();
+            UserDirectory userDirectory = _directoryRepository.FirstOrDefault(x => x.UserId == file.UserId && x.ParentDirectoryId == null);
+            UserFile userFile = await _fileRepository.AddFile(file, userDirectory);
 
-            using var stream = File.Create($"{fileUploadConfig.SaveFilePath}\\{file.Username}\\{fileName}");
+            using var stream = File.Create($"{fileUploadConfig.SaveFilePath}\\{file.Username}\\{userFile.Id.ToString()}");
             await file.File.CopyToAsync(stream);
 
             return userFile;
+        }
+
+        public async Task DeleteFile(string relativePath, string username)
+        {
+            var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();
+
+            var userId = _userRepository.FirstOrDefault(x => x.Username == username)?.Id;
+
+            UserFile file = await _fileRepository.MarkFileAsDeleted(relativePath, userId);
+
+            string oldPath = $"{fileUploadConfig.SaveFilePath}\\{relativePath.Replace(file.Name, file.Id.ToString())}";
+            string newPath = $"{fileUploadConfig.SaveFilePath}\\{username}\\archive\\{file.Id}";
+
+            File.Move(oldPath, newPath);
         }
 
         public async Task<DownloadFileDTO> DownloadFile(Guid fileId, string username)

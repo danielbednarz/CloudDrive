@@ -13,9 +13,9 @@ namespace CloudDrive.WebAPI
     {
         private readonly IFileService _fileService;
         private readonly IDirectoryService _directoryService;
-        private readonly IHubContext<FileHub, IFileHub> _hubContext;
+        private readonly IHubContext<FileHub> _hubContext;
 
-        public FileController(IFileService fileService, IDirectoryService directoryService, IHubContext<FileHub, IFileHub> hubContext)
+        public FileController(IFileService fileService, IDirectoryService directoryService, IHubContext<FileHub> hubContext)
         {
             _fileService = fileService;
             _directoryService = directoryService;
@@ -23,10 +23,9 @@ namespace CloudDrive.WebAPI
         }
 
         [Authorize]
-        [HttpPost("uploadFile")]
-        public async Task<IActionResult> UploadFile()
+        [HttpGet("getUserFiles")]
+        public async Task<IActionResult> GetUserFiles()
         {
-            var file = Request.Form.Files.FirstOrDefault();
             var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (loggedUsername == null)
@@ -34,17 +33,54 @@ namespace CloudDrive.WebAPI
                 return NotFound("Błąd przy próbie znalezienia użytkownika");
             }
 
-            if (file.Length > 0)
-            {
-                AddUserFileVM userFile = new()
-                {
-                    File = file,
-                    Username = loggedUsername,
-                };
+            List<FileDataDTO> list = await _fileService.GetUserFiles(loggedUsername);
 
-                UserFile addedFile = await _fileService.AddFile(userFile);
-                await _hubContext.Clients.All.FileAdded(addedFile.Id, addedFile.Name);
+            return Ok(list);
+        }
+
+
+        [Authorize]
+        [HttpPost("uploadFile")]
+        public async Task<IActionResult> UploadFile()
+        {
+            var files = Request.Form.Files;
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
             }
+
+            foreach (var file in files)
+            {
+                if (file.Length > 0)
+                {
+                    AddUserFileVM userFile = new()
+                    {
+                        File = file,
+                        Username = loggedUsername,
+                    };
+
+                    UserFile addedFile = await _fileService.AddFile(userFile);
+                    await _hubContext.Clients.Group(loggedUsername).SendAsync("FileAdded", default, addedFile.Name);
+                }
+            }
+
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpDelete("deleteFile")]
+        public async Task<IActionResult> DeleteFile(string relativePath)
+        {
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            await _fileService.DeleteFile(relativePath, loggedUsername);
 
             return Ok();
         }
@@ -63,6 +99,22 @@ namespace CloudDrive.WebAPI
             await _directoryService.AddDirectory(model, loggedUsername);
 
             return Ok();
+        }
+        
+        [Authorize]
+        [HttpGet("getDirectoriesToSelectList")]
+        public async Task<IActionResult> GetDirectoriesToSelectList()
+        {
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            List<DirectorySelectBoxVM> list = await _directoryService.GetDirectoriesToSelectList(loggedUsername);
+
+            return Ok(list);
         }
 
         [Authorize]

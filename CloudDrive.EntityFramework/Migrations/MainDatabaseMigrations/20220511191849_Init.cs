@@ -63,7 +63,8 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RelativePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    DirectoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    DirectoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

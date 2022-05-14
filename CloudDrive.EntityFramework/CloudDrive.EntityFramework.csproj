@@ -26,7 +26,6 @@
   <ItemGroup>
     <Folder Include="Contexts\" />
     <Folder Include="Migrations\" />
-    <Folder Include="Migrations\MainDatabaseMigrations\" />
   </ItemGroup>
 
 </Project>
