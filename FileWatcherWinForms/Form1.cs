@@ -18,6 +18,7 @@ namespace FileWatcherWinForms
     {
         string currentUser;
         string currentTokenUser;
+   
         public CloudDrive()
         {
             InitializeComponent();
@@ -79,13 +80,14 @@ namespace FileWatcherWinForms
         {
             string value = $"Created: {e.FullPath}";
             String filename = Path.GetFileName(e.FullPath);
-            var res = await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename);
+            var res = await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename, observedPath.Text);
             SaveLog(value);
 
         }
 
         private void fileSystemWatcher1_Deleted(object sender, FileSystemEventArgs e)
         {
+            RestHelper.DeleteFile(e.FullPath, observedPath.Text, currentTokenUser);
             SaveLog($"Deleted: {e.FullPath}");
         }
 

@@ -70,6 +70,32 @@ namespace CloudDrive.WebAPI
         }
 
         [Authorize]
+        [HttpPost("uploadFileByFileWatcher")]
+        public async Task<IActionResult> UploadFileByFileWathcer(string relativePath)
+        {
+            var file = Request.Form.Files.FirstOrDefault();
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            if (file.Length > 0)
+            {
+                AddUserFileVM userFile = new()
+                {
+                    File = file,
+                    Username = loggedUsername,
+                };
+                //UserFile addedFile = await _fileService.AddFile(userFile);
+                UserFile addedFile = await _fileService.AddFileByFileWatcher(userFile, relativePath);
+            }
+
+            return Ok();
+        }
+
+        [Authorize]
         [HttpDelete("deleteFile")]
         public async Task<IActionResult> DeleteFile(string relativePath)
         {

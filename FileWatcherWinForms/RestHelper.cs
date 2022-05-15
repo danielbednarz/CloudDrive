@@ -34,10 +34,11 @@ namespace FileWatcherWinForms
             return string.Empty;
         }
 
-        public static async Task<string> UploadFile(string filePath, string token, string fileName)
+        public static async Task<string> UploadFile(string filePath, string token, string fileName, string observedPath)
         {
             string allToken = "Bearer ";
             allToken += token;
+            string relativePath = filePath.Replace(observedPath, "");
             using (HttpClient client = new HttpClient())
             {
                 //client.DefaultRequestHeaders.Add("Authorization", allToken);
@@ -47,9 +48,9 @@ namespace FileWatcherWinForms
                     Stream fileStream = File.OpenRead(filePath);
                     HttpContent fileStreamContent = new StreamContent(fileStream);
                     //fileStreamContent.Headers.Add("Authorization", allToken);
-                    formData.Add(fileStreamContent, "file", "PlikTestowy.txt");
+                    formData.Add(fileStreamContent, "file", fileName);
                     //formData.Headers.Add("Authorization", allToken);
-                    using (HttpResponseMessage res = await client.PostAsync(baseURL + "File/uploadFile", formData))
+                    using (HttpResponseMessage res = await client.PostAsync(baseURL + "File/uploadFileByFileWatcher?relativePath="+ relativePath, formData))
                     {
                         using (HttpContent content = res.Content)
                         {
@@ -58,6 +59,27 @@ namespace FileWatcherWinForms
                             {
                                 return data;
                             }
+                        }
+                    }
+                }
+            }
+            return string.Empty;
+        }
+
+        public static async Task<string> DeleteFile(string filePath, string observedPath, string token)
+        {
+            string relativePath = filePath.Replace(observedPath, "");
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                using (HttpResponseMessage res = await client.DeleteAsync(baseURL + "File/deleteFile?relativePath=" + relativePath))
+                {
+                    using (HttpContent content = res.Content)
+                    {
+                        string data = await content.ReadAsStringAsync();
+                        if (data != null)
+                        {
+                            return data;
                         }
                     }
                 }

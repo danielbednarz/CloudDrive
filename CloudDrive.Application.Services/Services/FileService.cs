@@ -41,8 +41,25 @@ namespace CloudDrive.Application
             return userFile;
         }
 
+        public async Task<UserFile> AddFileByFileWatcher(AddUserFileVM file, string relativePath)
+        {
+            var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();
+
+            file.UserId = _userRepository.FirstOrDefault(x => x.Username == file.Username)?.Id;
+
+            UserDirectory userDirectory = _directoryRepository.FirstOrDefault(x => x.UserId == file.UserId && x.ParentDirectoryId == null);
+            UserFile userFile = await _fileRepository.AddFile(file, userDirectory);
+            userFile.RelativePath = relativePath;
+
+            using var stream = File.Create($"{fileUploadConfig.SaveFilePath}\\{file.Username}\\{userFile.Id.ToString()}");
+            await file.File.CopyToAsync(stream);
+
+            return userFile;
+        }
+
         public async Task DeleteFile(string relativePath, string username)
         {
+            relativePath = username + relativePath;
             var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();
 
             var userId = _userRepository.FirstOrDefault(x => x.Username == username)?.Id;
