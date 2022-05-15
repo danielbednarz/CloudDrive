@@ -1,31 +1,57 @@
 <template>
-  <div class="row justify-center">
-    <q-uploader
-      url="https://localhost:44390/api/File/uploadFile"
-      color="secondary"
-      text-color="dark"
-      square
-      flat
-      bordered
-      multiple
-      class="uploader q-mt-lg"
-      @added="added"
-      @removed="clearForm"
-      @uploading="onUploading"
-      @failed="onError"
-      :headers="[
-        {
-          name: 'Authorization',
-          value: `Bearer ${currentUser.token}`,
-        },
-      ]"
-      v-if="currentUser"
-    />
+  <div class="justify-center" v-if="currentUser">
+    <div class="row q-py-lg">
+      <div class="column form-field">
+        <q-select
+          filled
+          v-model="ChosenDirectory"
+          label="Folder"
+          color="secondary"
+          dark
+          :options="directories"
+          option-label="text"
+          option-value="value"
+          emit-value
+          map-options
+          dense
+          clearable
+        />
+      </div>
+    </div>
+    <div class="row">
+      <q-uploader
+        url="https://localhost:44390/api/File/uploadFile"
+        color="secondary"
+        text-color="dark"
+        square
+        flat
+        bordered
+        multiple
+        class="uploader q-mt-lg"
+        @added="added"
+        @removed="clearForm"
+        @uploading="onUploading"
+        @failed="onError"
+        :headers="[
+          {
+            name: 'Authorization',
+            value: `Bearer ${currentUser.token}`,
+          },
+        ]"
+        :form-fields="[
+          {
+            name: 'DirectoryId',
+            value: ChosenDirectory,
+          },
+        ]"
+      />
+    </div>
   </div>
 </template>
 <script>
 import { useUploadStore } from "../stores/upload.js";
 import { useAuthenticationStore } from "../stores/authentication.js";
+import { useDirectoryStore } from "../stores/directory.js";
 import { mapActions, mapWritableState, mapState } from "pinia";
 import { useQuasar } from "quasar";
 
@@ -33,18 +59,21 @@ export default {
   name: "UploadPage",
   data() {
     return {
+      directories: [],
+      ChosenDirectory: "",
       $q: useQuasar(),
     };
   },
   computed: {
-    ...mapWritableState(useUploadStore, ["files"]),
+    //...mapWritableState(useUploadStore, ["files"]),
     ...mapState(useAuthenticationStore, ["currentUser"]),
   },
   methods: {
     ...mapActions(useUploadStore, ["uploadFile", "clearForm"]),
-    added(addedFiles) {
-      this.files = addedFiles;
-    },
+    ...mapActions(useDirectoryStore, ["getDirectoriesToSelectList"]),
+    // added(addedFiles) {
+    //   this.files = addedFiles;
+    // },
     onUploading() {
       this.$q.notify({
         type: "info",
@@ -60,6 +89,11 @@ export default {
       });
     },
   },
+  mounted() {
+    this.getDirectoriesToSelectList().then((response) => {
+      this.directories = response;
+    });
+  },
   beforeUnmount() {
     this.clearForm();
     this.files = [];
@@ -70,5 +104,8 @@ export default {
 .uploader {
   width: 90%;
   min-width: 250px;
+}
+.form-field {
+  width: 40%;
 }
 </style>

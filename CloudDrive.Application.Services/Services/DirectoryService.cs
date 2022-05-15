@@ -38,15 +38,14 @@ namespace CloudDrive.Application
 
         public async Task AddDirectory(AddDirectoryVM model, string username)
         {
-            if (model.ParentDirectoryId.HasValue)
+            if (!model.ParentDirectoryId.HasValue)
             {
-                UserDirectory parentDirectory = _directoryRepository.FirstOrDefault(x => x.Id == model.ParentDirectoryId) ?? throw new Exception("Wybrany folder nadrzedny nie istnieje");
-                model.GeneratedPath = Path.Combine(parentDirectory.RelativePath, model.Name);
+                model.ParentDirectoryId = _directoryRepository.FirstOrDefault(x => x.RelativePath == username).Id;
             }
-            else
-            {
-                model.GeneratedPath = Path.Combine(username, model.Name);
-            }
+
+            UserDirectory parentDirectory = _directoryRepository.FirstOrDefault(x => x.Id == model.ParentDirectoryId) ?? throw new Exception("Wybrany folder nadrzedny nie istnieje");
+            model.GeneratedPath = Path.Combine(parentDirectory.RelativePath, model.Name);
+
             AppUser user = _userRepository.FirstOrDefault(x => x.Username == username) ?? throw new Exception("Użytkownik nie istnieje");
             model.UserId = user.Id;
 
@@ -64,7 +63,7 @@ namespace CloudDrive.Application
         public async Task<List<DirectorySelectBoxVM>> GetDirectoriesToSelectList(string username)
         {
             AppUser user = _userRepository.FirstOrDefault(x => x.Username == username) ?? throw new Exception("Użytkownik nie istnieje");
-            return await _directoryRepository.GetDirectoriesToSelectList(user.Id);
+            return await _directoryRepository.GetDirectoriesToSelectList(user.Id, username);
         }
 
     }

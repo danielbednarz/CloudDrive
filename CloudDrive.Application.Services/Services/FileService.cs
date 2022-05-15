@@ -32,10 +32,15 @@ namespace CloudDrive.Application
 
             file.UserId = _userRepository.FirstOrDefault(x => x.Username == file.Username)?.Id;
 
-            UserDirectory userDirectory = _directoryRepository.FirstOrDefault(x => x.UserId == file.UserId && x.ParentDirectoryId == null);
+            if (!file.DirectoryId.HasValue)
+            {
+                file.DirectoryId = _directoryRepository.FirstOrDefault(x => x.RelativePath == file.Username).Id;
+            }
+
+            UserDirectory userDirectory = _directoryRepository.FirstOrDefault(x => x.Id == file.DirectoryId);
             UserFile userFile = await _fileRepository.AddFile(file, userDirectory);
 
-            using var stream = File.Create($"{fileUploadConfig.SaveFilePath}\\{file.Username}\\{userFile.Id.ToString()}");
+            using var stream = File.Create($"{fileUploadConfig.SaveFilePath}\\{userDirectory.RelativePath}\\{userFile.Id.ToString()}");
             await file.File.CopyToAsync(stream);
 
             return userFile;
