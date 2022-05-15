@@ -16,6 +16,14 @@
         <template v-slot:item="props">
           <div class="q-pa-xs col-2">
             <q-card class="file-card bg-secondary text-black">
+              <q-card-actions class="delete-button" text-align="right">
+                <q-btn
+                  flat
+                  round
+                  icon="fa-solid fa-trash"
+                  @click="tryDelete(props.row.relativePath)"
+                />
+              </q-card-actions>
               <q-card-section class="text-center">
                 <i class="fa-solid fa-file text-h5"></i>
                 <div class="text-body2">{{ props.row.name }}</div>
@@ -76,7 +84,17 @@ export default {
   computed: {},
   methods: {
     ...mapActions(useDirectoryStore, ["getDirectoriesToSelectList"]),
-    ...mapActions(useFileStore, ["getUserFiles"]),
+    ...mapActions(useFileStore, ["getUserFiles", "deleteFile"]),
+    async tryDelete(relativePath) {
+      await this.deleteFile(relativePath);
+      this.getUserFiles().then((response) => {
+        this.files = response;
+        this.$q.notify({
+          type: "positive",
+          message: `Plik usunięty pomyślnie!`,
+        });
+      });
+    },
   },
   mounted() {
     this.getUserFiles().then((response) => {
@@ -96,5 +114,9 @@ export default {
 .file-card:hover {
   opacity: 1;
   cursor: pointer;
+}
+.delete-button {
+  padding: 0;
+  margin-left: auto;
 }
 </style>

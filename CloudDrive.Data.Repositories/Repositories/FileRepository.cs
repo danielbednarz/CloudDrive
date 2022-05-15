@@ -15,7 +15,7 @@ namespace CloudDrive.Data.Repositories
 
         public async Task<List<FileDataDTO>> GetUserFiles(int userId)
         {
-            return await _context.Files.Where(x => x.UserId == userId).Select(x => new FileDataDTO
+            return await _context.Files.Where(x => x.UserId == userId && x.IsDeleted == false).Select(x => new FileDataDTO
             {
                 Id = x.Id,
                 Name = x.Name,

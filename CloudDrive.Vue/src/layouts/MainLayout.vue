@@ -141,9 +141,10 @@ export default {
     tryLogout() {
       this.logout();
       this.$q.notify({
-        type: "positive",
-        message: `Wylogowano pomyślnie!`,
+        type: "info",
+        message: `Wylogowano pomyślnie`,
       });
+      this.$router.push({ name: "home" });
     },
   },
   mounted() {
