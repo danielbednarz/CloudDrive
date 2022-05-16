@@ -13,12 +13,12 @@ using System.Text.Json.Serialization;
 
 namespace FileWatcherWinForms
 {
-    
+
     public partial class CloudDrive : Form
     {
         string currentUser;
         string currentTokenUser;
-   
+
         public CloudDrive()
         {
             InitializeComponent();
@@ -79,10 +79,12 @@ namespace FileWatcherWinForms
         private async void fileSystemWatcher1_Created(object sender, FileSystemEventArgs e)
         {
             string value = $"Created: {e.FullPath}";
+
             string filename = Path.GetFileName(e.FullPath);
 
             await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename, observedPath.Text);
             SaveLog(value);
+
 
         }
 
@@ -157,7 +159,7 @@ namespace FileWatcherWinForms
         private async void login_Click(object sender, EventArgs e)
         {
             User user = new User();
-            UserDTO userDTO=null;
+            UserDTO userDTO = null;
             user.username = username.Text;
             user.password = password.Text;
             var response = await RestHelper.Login(user);
@@ -176,6 +178,12 @@ namespace FileWatcherWinForms
                 button_edit.Visible = true;
                 observedPath.Visible = true;
                 fileSystemWatcher1.EnableRaisingEvents = true;
+                fileSystemWatcher1.IncludeSubdirectories = true;
+                fileSystemWatcher1.NotifyFilter = NotifyFilters.CreationTime
+                                 | NotifyFilters.FileName
+                                 | NotifyFilters.LastWrite
+                                 | NotifyFilters.Size;
+
                 currentUser = userDTO.username;
                 currentTokenUser = userDTO.token;
                 //var res = await RestHelper.UploadFile("E:\\PlikTestowy.txt", userDTO.token);
