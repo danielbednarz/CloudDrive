@@ -1,7 +1,58 @@
 <template>
   <div class="section-container">
     <p class="text-h5 q-mt-lg q-mb-xs">Pliki</p>
-    <div class="q-pa-md">
+    <div class="q-pa-md text-white">
+      <q-splitter v-model="splitterModel">
+        <template v-slot:before>
+          <q-tree
+            :nodes="getUserDirectories"
+            node-key="id"
+            color="secondary"
+            label-key="name"
+            dark
+            v-model:selected="selected"
+            ref="directoriesTree"
+            no-nodes-label="Dysk jest pusty"
+            no-results-label="Dysk jest pusty"
+          />
+        </template>
+        <template v-slot:after>
+          <p class="text-body1" v-if="!selected">Wybierz plik lub folder</p>
+          <div v-else>
+            <p class="text-body1">Wybrano {{ getSelectedObject.name }}</p>
+            <p class="text-body2">
+              Jego ścieżka to
+              {{ getSelectedObject.relativePath }}
+            </p>
+            <div
+              class="row justify-center q-my-xl"
+              v-if="getSelectedObject.isFile"
+            >
+              <div class="column">
+                <q-btn
+                  icon="fa-solid fa-download"
+                  color="secondary"
+                  text-color="black"
+                  label="Pobierz"
+                  class="q-mx-sm"
+                />
+              </div>
+              <div class="column">
+                <q-btn
+                  icon="fa-solid fa-trash"
+                  color="secondary"
+                  text-color="black"
+                  label="Usun"
+                  class="q-mx-sm"
+                  @click="tryDelete(getSelectedObject.relativePath)"
+                />
+              </div>
+            </div>
+          </div>
+        </template>
+      </q-splitter>
+    </div>
+    <!-- <div class="q-pa-md">
       <q-table
         grid
         :rows="files"
@@ -22,6 +73,7 @@
                   round
                   icon="fa-solid fa-trash"
                   @click="tryDelete(props.row.relativePath)"
+                  class="small-icon q-ma-xs"
                 />
               </q-card-actions>
               <q-card-section class="text-center">
@@ -38,21 +90,8 @@
             </q-card>
           </div>
         </template>
-        <!-- <template v-slot:top-right>
-        <q-input
-          borderless
-          dense
-          debounce="300"
-          v-model="filter"
-          placeholder="Search"
-        >
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-      </template> -->
       </q-table>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -65,30 +104,33 @@ export default {
   name: "FileGrid",
   data() {
     return {
-      directories: [],
-      files: [],
-      columns: [
-        {
-          name: "Name",
-          field: (row) => row.name,
-          format: (val) => `${val}`,
-        },
-        {
-          name: "Size",
-          field: (row) => row.size,
-          format: (val) => `${val}`,
-        },
-      ],
+      // files: [],
+      userDirectories: [],
+      selected: null,
+      splitterModel: 50,
     };
   },
-  computed: {},
+  computed: {
+    getSelectedObject() {
+      return this.selected
+        ? this.$refs["directoriesTree"].getNodeByKey(this.selected)
+        : null;
+    },
+    getUserDirectories() {
+      return this.userDirectories;
+    },
+  },
   methods: {
-    ...mapActions(useDirectoryStore, ["getDirectoriesToSelectList"]),
+    ...mapActions(useDirectoryStore, [
+      "getDirectoriesToSelectList",
+      "getUserDriveDataToTreeView",
+    ]),
     ...mapActions(useFileStore, ["getUserFiles", "deleteFile"]),
     async tryDelete(relativePath) {
       await this.deleteFile(relativePath);
-      this.getUserFiles().then((response) => {
-        this.files = response;
+      this.getUserDriveDataToTreeView().then((response) => {
+        this.userDirectories = response;
+        this.selected = null;
         this.$q.notify({
           type: "positive",
           message: `Plik usunięty pomyślnie!`,
@@ -97,11 +139,11 @@ export default {
     },
   },
   mounted() {
-    this.getUserFiles().then((response) => {
-      this.files = response;
-    });
-    this.getDirectoriesToSelectList().then((response) => {
-      this.directories = response;
+    // this.getUserFiles().then((response) => {
+    //   this.files = response;
+    // });
+    this.getUserDriveDataToTreeView().then((response) => {
+      this.userDirectories = response;
     });
   },
 };
@@ -118,5 +160,8 @@ export default {
 .delete-button {
   padding: 0;
   margin-left: auto;
+}
+.small-icon {
+  font-size: 0.7em;
 }
 </style>

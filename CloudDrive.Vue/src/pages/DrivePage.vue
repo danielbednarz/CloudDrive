@@ -66,7 +66,7 @@ export default {
   },
   methods: {
     getButtonLabel() {
-      return this.isAddFolderMenuOpen ? "Zamknij" : "Dodaj folder";
+      return this.isAddFolderMenuOpen ? "Zamknij" : "Nowy folder";
     },
     getTextColor() {
       return this.isAddFolderMenuOpen ? "secondary" : "black";

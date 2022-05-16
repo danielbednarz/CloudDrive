@@ -12,5 +12,6 @@ namespace CloudDrive.Application
         public DateTime UpdatedDate { get; set; }
         public string RelativePath { get; set; }
         public Guid? DirectoryId { get; set; }
+        public Guid? ParentDictoryId { get; set; }
     }
 }

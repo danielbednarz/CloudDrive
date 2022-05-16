@@ -38,6 +38,21 @@ namespace CloudDrive.WebAPI
             return Ok(list);
         }
 
+        [Authorize]
+        [HttpGet("getUserDriveDataToTreeView")]
+        public async Task<IActionResult> GetUserDriveDataToTreeView()
+        {
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            List<UserDirectoryDTO> list = await _directoryService.GetUserDriveDataToTreeView(loggedUsername);
+            return Ok(list);
+        }
+
 
         [Authorize]
         [HttpPost("uploadFile")]

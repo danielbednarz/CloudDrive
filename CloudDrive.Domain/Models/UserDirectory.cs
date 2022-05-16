@@ -10,5 +10,6 @@
         public virtual AppUser User { get; set; }
         public virtual UserDirectory ParentDirectory { get; set; }
         public virtual ICollection<UserFile> Files { get; set; }
+        public virtual ICollection<UserDirectory> ChildDirectories { get; set; }
     }
 }

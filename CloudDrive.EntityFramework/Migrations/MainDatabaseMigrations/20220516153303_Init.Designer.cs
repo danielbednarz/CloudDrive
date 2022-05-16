@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
 {
     [DbContext(typeof(MainDatabaseContext))]
-    [Migration("20220511191849_Init")]
+    [Migration("20220516153303_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -154,7 +154,7 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
             modelBuilder.Entity("CloudDrive.Domain.UserDirectory", b =>
                 {
                     b.HasOne("CloudDrive.Domain.UserDirectory", "ParentDirectory")
-                        .WithMany()
+                        .WithMany("ChildDirectories")
                         .HasForeignKey("ParentDirectoryId");
 
                     b.HasOne("CloudDrive.Domain.AppUser", "User")
@@ -192,6 +192,8 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
 
             modelBuilder.Entity("CloudDrive.Domain.UserDirectory", b =>
                 {
+                    b.Navigation("ChildDirectories");
+
                     b.Navigation("Files");
                 });
 

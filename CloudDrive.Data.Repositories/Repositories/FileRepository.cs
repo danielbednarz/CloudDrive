@@ -24,7 +24,8 @@ namespace CloudDrive.Data.Repositories
                 CreatedDate = x.CreatedDate,
                 UpdatedDate = x.UpdatedDate,
                 RelativePath = x.RelativePath,
-                DirectoryId = x.DirectoryId
+                DirectoryId = x.DirectoryId,
+                ParentDictoryId = x.Directory.ParentDirectoryId
             }).ToListAsync();
         }
         

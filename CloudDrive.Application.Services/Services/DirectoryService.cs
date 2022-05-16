@@ -19,6 +19,40 @@ namespace CloudDrive.Application
             _config = config;
         }
 
+        public async Task<List<UserDirectoryDTO>> GetUserDriveDataToTreeView(string username)
+        {
+            UserDirectory mainDirectory = _directoryRepository.FirstOrDefault(x => x.RelativePath == username) ?? throw new Exception("Uzytkownik nie posiada katalogu");
+            List<UserDirectory> listDirectories = await _directoryRepository.GetUserDriveDataToTreeView(username, mainDirectory.Id);
+            List<UserDirectoryDTO> listDTO = FromUserDirectoryToDTO(listDirectories);
+
+            return listDTO;
+        }
+
+        private List<UserDirectoryDTO> FromUserDirectoryToDTO(List<UserDirectory> userDirectory)
+        {
+            return userDirectory.Select(x => new UserDirectoryDTO()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                RelativePath = x.RelativePath,
+                Children = (x.ChildDirectories != null ? FromUserDirectoryToDTO(x.ChildDirectories.ToList()) : null).Concat(x.Files != null ? FromUserFileToDTO(x.Files.ToList()) : null).ToList(),
+                Icon = "fa-solid fa-folder",
+                IsFile = false
+            }).ToList();
+        }
+
+        private List<UserDirectoryDTO> FromUserFileToDTO(List<UserFile> userFile)
+        {
+            return userFile.Where(x => !x.IsDeleted).Select(x => new UserDirectoryDTO()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                RelativePath = x.RelativePath,
+                Icon = "fa-solid fa-file",
+                IsFile = true
+            }).ToList();
+        }
+
         private string CreateDirectoryOnServer(string userChosenPath)
         {
             string mainPath = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>().SaveFilePath;

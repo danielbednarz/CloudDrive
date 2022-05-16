@@ -152,7 +152,7 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
             modelBuilder.Entity("CloudDrive.Domain.UserDirectory", b =>
                 {
                     b.HasOne("CloudDrive.Domain.UserDirectory", "ParentDirectory")
-                        .WithMany()
+                        .WithMany("ChildDirectories")
                         .HasForeignKey("ParentDirectoryId");
 
                     b.HasOne("CloudDrive.Domain.AppUser", "User")
@@ -190,6 +190,8 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
 
             modelBuilder.Entity("CloudDrive.Domain.UserDirectory", b =>
                 {
+                    b.Navigation("ChildDirectories");
+
                     b.Navigation("Files");
                 });
 

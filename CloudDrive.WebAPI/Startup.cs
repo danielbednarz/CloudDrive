@@ -26,6 +26,7 @@ namespace CloudDrive.WebAPI
             services.AddControllers();
             services.AddDbContext<MainDatabaseContext>(options =>
             {
+                options.UseLazyLoadingProxies();
                 options.UseSqlServer(Configuration.GetConnectionString("MainDatabaseContext"));
             });
             services.AddSwaggerGen(c =>

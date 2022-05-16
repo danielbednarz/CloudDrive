@@ -13,6 +13,13 @@ namespace CloudDrive.Data.Repositories
         {
         }
 
+        public async Task<List<UserDirectory>> GetUserDriveDataToTreeView(string username, Guid mainDirectoryId)
+        {
+            return await _context.UserDirectories
+                .Where(x => x.ParentDirectoryId == mainDirectoryId && x.RelativePath != username && x.RelativePath != $"{username}\\archive")
+                .ToListAsync();
+        }
+
         public async Task AddDirectory(AddDirectoryVM model)
         {
             await _context.UserDirectories.AddAsync(new UserDirectory

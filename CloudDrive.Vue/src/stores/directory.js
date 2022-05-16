@@ -8,7 +8,7 @@ export const useDirectoryStore = defineStore({
   state: () => ({
     form: {
       Name: "",
-      ParentDirectoryId: "",
+      ParentDirectoryId: null,
     },
   }),
   actions: {
@@ -21,7 +21,7 @@ export const useDirectoryStore = defineStore({
     },
     clearForm() {
       this.form.Name = "";
-      this.form.ParentDirectoryId = "";
+      this.form.ParentDirectoryId = null;
     },
     getDirectoriesToSelectList() {
       if (
@@ -31,6 +31,24 @@ export const useDirectoryStore = defineStore({
         return new Promise((resolve) => {
           api
             .get("/File/getDirectoriesToSelectList", {
+              headers: {
+                Authorization: `Bearer ${authenticationStore.currentUser.token}`,
+              },
+            })
+            .then((response) => {
+              resolve(response.data);
+            });
+        });
+      }
+    },
+    getUserDriveDataToTreeView() {
+      if (
+        authenticationStore.currentUser &&
+        authenticationStore.currentUser.token
+      ) {
+        return new Promise((resolve) => {
+          api
+            .get("/File/getUserDriveDataToTreeView", {
               headers: {
                 Authorization: `Bearer ${authenticationStore.currentUser.token}`,
               },
