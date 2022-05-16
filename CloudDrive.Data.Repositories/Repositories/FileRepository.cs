@@ -90,6 +90,7 @@ namespace CloudDrive.Data.Repositories
 
             file.IsDeleted = true;
             file.RelativePath = @$"archive\{file.Name}";
+            file.DirectoryId = _context.UserDirectories.FirstOrDefault(x => x.UserId == userId && x.Name == "archive").Id;
 
             _context.Files.Update(file);
             await _context.SaveChangesAsync();

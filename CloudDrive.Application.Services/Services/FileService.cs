@@ -77,7 +77,7 @@ namespace CloudDrive.Application
             }
 
             // pobranie katalogu do którego należy dodać plik
-            var userDirectory = _directoryRepository.FirstOrDefault(x => x.RelativePath == relativePath);
+            var userDirectory = await _directoryRepository.FirstOrDefaultAsync(x => x.RelativePath == relativePath);
 
             // w przypadku, gdy katalogu nie ma na serwerze
             if (userDirectory == null)
@@ -102,7 +102,7 @@ namespace CloudDrive.Application
             userFile = await _fileRepository.AddFile(file, userDirectory);
             userFile.RelativePath = relativePathWithFileName;
 
-            using var stream2 = File.Create($"{fileUploadConfig.SaveFilePath}\\{file.Username}\\{userFile.Id.ToString()}");
+            using var stream2 = File.Create($"{fileUploadConfig.SaveFilePath}\\{relativePath}{userFile.Id.ToString()}");
             await file.File.CopyToAsync(stream2);
 
             return userFile;

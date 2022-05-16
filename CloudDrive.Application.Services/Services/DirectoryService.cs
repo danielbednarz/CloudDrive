@@ -56,7 +56,8 @@ namespace CloudDrive.Application
             }
             else
             {
-                throw new Exception("Folder o podanej ścieżce już istnieje");
+                return;
+                //throw new Exception("Folder o podanej ścieżce już istnieje");
             }
         }
 
