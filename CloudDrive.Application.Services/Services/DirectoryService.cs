@@ -9,12 +9,14 @@ namespace CloudDrive.Application
     public class DirectoryService : IDirectoryService
     {
         private readonly IDirectoryRepository _directoryRepository;
+        private readonly IFileRepository _fileRepository;
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _config;
 
-        public DirectoryService(IDirectoryRepository directoryRepository, IUserRepository userRepository, IConfiguration config)
+        public DirectoryService(IDirectoryRepository directoryRepository, IFileRepository fileRepository, IUserRepository userRepository, IConfiguration config)
         {
             _directoryRepository = directoryRepository;
+            _fileRepository = fileRepository;
             _userRepository = userRepository;
             _config = config;
         }
@@ -23,7 +25,9 @@ namespace CloudDrive.Application
         {
             UserDirectory mainDirectory = _directoryRepository.FirstOrDefault(x => x.RelativePath == username) ?? throw new Exception("Uzytkownik nie posiada katalogu");
             List<UserDirectory> listDirectories = await _directoryRepository.GetUserDriveDataToTreeView(username, mainDirectory.Id);
+            List<UserFile> listFiles = await _fileRepository.GetUserDriveFilesToTreeView(mainDirectory.Id);
             List<UserDirectoryDTO> listDTO = FromUserDirectoryToDTO(listDirectories);
+            listDTO.AddRange(FromUserFileToDTO(listFiles));
 
             return listDTO;
         }

@@ -35,6 +35,7 @@
                   text-color="black"
                   label="Pobierz"
                   class="q-mx-sm"
+                  @click="tryDownload()"
                 />
               </div>
               <div class="column">
@@ -44,7 +45,7 @@
                   text-color="black"
                   label="Usun"
                   class="q-mx-sm"
-                  @click="tryDelete(getSelectedObject.relativePath)"
+                  @click="tryDelete()"
                 />
               </div>
             </div>
@@ -125,9 +126,9 @@ export default {
       "getDirectoriesToSelectList",
       "getUserDriveDataToTreeView",
     ]),
-    ...mapActions(useFileStore, ["getUserFiles", "deleteFile"]),
-    async tryDelete(relativePath) {
-      await this.deleteFile(relativePath);
+    ...mapActions(useFileStore, ["getUserFiles", "deleteFile", "downloadFile"]),
+    async tryDelete() {
+      await this.deleteFile(this.getSelectedObject.relativePath);
       this.getUserDriveDataToTreeView().then((response) => {
         this.userDirectories = response;
         this.selected = null;
@@ -135,6 +136,12 @@ export default {
           type: "positive",
           message: `Plik usunięty pomyślnie!`,
         });
+      });
+    },
+    async tryDownload() {
+      await this.downloadFile({
+        id: this.getSelectedObject.id,
+        name: this.getSelectedObject.name,
       });
     },
   },
