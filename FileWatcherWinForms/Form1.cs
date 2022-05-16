@@ -79,8 +79,9 @@ namespace FileWatcherWinForms
         private async void fileSystemWatcher1_Created(object sender, FileSystemEventArgs e)
         {
             string value = $"Created: {e.FullPath}";
-            String filename = Path.GetFileName(e.FullPath);
-            var res = await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename, observedPath.Text);
+            string filename = Path.GetFileName(e.FullPath);
+
+            await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename, observedPath.Text);
             SaveLog(value);
 
         }

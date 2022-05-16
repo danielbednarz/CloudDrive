@@ -33,9 +33,11 @@ namespace CloudDrive.Data.Repositories
             var fileName = file.File.FileName;
             long fileVersion = 0;
 
+            var fileContentType = GetMimeType(file.File.FileName);
+
             if (_context.Files.Any(x => x.Name == fileName))
             {
-                fileVersion = _context.Files.Where(y => y.Name == fileName && y.ContentType == file.File.ContentType)
+                fileVersion = _context.Files.Where(y => y.Name == fileName && y.ContentType == fileContentType)
                     .Select(x => x.FileVersion).ToList().Max();
 
                 fileVersion += 1;
@@ -47,7 +49,7 @@ namespace CloudDrive.Data.Repositories
                 Size = file.File.Length,
                 FileVersion = fileVersion,
                 CreatedDate = DateTime.Now,
-                ContentType = file.File.ContentType,
+                ContentType = fileContentType,
                 RelativePath = @$"{userDirectory.RelativePath}\{fileName}",
                 UserId = file.UserId.Value,
                 DirectoryId = userDirectory.Id
@@ -57,6 +59,21 @@ namespace CloudDrive.Data.Repositories
             await _context.SaveChangesAsync();
 
             return userFile;
+        }
+
+        private static string GetMimeType(string fileName)
+        {
+            string mimeType = "application/unknown";
+            string ext = Path.GetExtension(fileName).ToLower();
+
+            Microsoft.Win32.RegistryKey regKey = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ext);
+
+            if (regKey != null && regKey.GetValue("Content Type") != null)
+            {
+                mimeType = regKey.GetValue("Content Type").ToString();
+            }
+
+            return mimeType;
         }
 
         public async Task<UserFile> GetFileById(Guid fileId)

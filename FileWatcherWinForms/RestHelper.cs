@@ -36,33 +36,44 @@ namespace FileWatcherWinForms
 
         public static async Task<string> UploadFile(string filePath, string token, string fileName, string observedPath)
         {
-            string allToken = "Bearer ";
-            allToken += token;
-            string relativePath = filePath.Replace(observedPath, "");
-            using (HttpClient client = new HttpClient())
+            byte[] fileContent;
+
+            while (true)
             {
-                //client.DefaultRequestHeaders.Add("Authorization", allToken);
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                using (var formData = new MultipartFormDataContent())
+                try
                 {
-                    Stream fileStream = File.OpenRead(filePath);
-                    HttpContent fileStreamContent = new StreamContent(fileStream);
-                    //fileStreamContent.Headers.Add("Authorization", allToken);
-                    formData.Add(fileStreamContent, "file", fileName);
-                    //formData.Headers.Add("Authorization", allToken);
-                    using (HttpResponseMessage res = await client.PostAsync(baseURL + "File/uploadFileByFileWatcher?relativePath="+ relativePath, formData))
-                    {
-                        using (HttpContent content = res.Content)
-                        {
-                            string data = await content.ReadAsStringAsync();
-                            if (data != null)
-                            {
-                                return data;
-                            }
-                        }
-                    }
+                    fileContent = File.ReadAllBytes(filePath);
+                    break;
+                }
+                catch
+                {
+                    Thread.Sleep(100);
                 }
             }
+
+            string relativePath = filePath.Replace(observedPath, "");
+            using (HttpClient client = new())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                using var content = new MultipartFormDataContent();
+                
+                content.Add(new StreamContent(new MemoryStream(fileContent)), "file", fileName);
+
+                using var res = await client.PostAsync(baseURL + "File/uploadFileByFileWatcher?relativePath=" + relativePath, content);
+
+                content.Dispose();
+
+                using HttpContent responseContent = res.Content;
+                string data = await responseContent.ReadAsStringAsync();
+            
+                if (data != null)
+                {
+                    return data;
+                }
+
+                client.Dispose();
+            }
+
             return string.Empty;
         }
 
