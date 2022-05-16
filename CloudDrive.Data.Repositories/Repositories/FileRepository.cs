@@ -52,7 +52,7 @@ namespace CloudDrive.Data.Repositories
                 ContentType = fileContentType,
                 RelativePath = @$"{userDirectory.RelativePath}\{fileName}",
                 UserId = file.UserId.Value,
-                DirectoryId = file.DirectoryId
+                DirectoryId = userDirectory.Id
             };
 
             await _context.Files.AddAsync(userFile);
