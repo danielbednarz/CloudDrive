@@ -88,8 +88,8 @@ namespace CloudDrive.WebAPI
                     File = file,
                     Username = loggedUsername,
                 };
-                //UserFile addedFile = await _fileService.AddFile(userFile);
-                UserFile addedFile = await _fileService.AddFileByFileWatcher(userFile, relativePath);
+
+                await _fileService.AddFileByFileWatcher(userFile, relativePath);
             }
 
             return Ok();
