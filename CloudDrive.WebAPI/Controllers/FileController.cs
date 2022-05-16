@@ -85,10 +85,12 @@ namespace CloudDrive.WebAPI
 
             if (file.Length > 0)
             {
+                var dictionaryId = Request.Form.FirstOrDefault(x => x.Key == "DirectoryId");
                 AddUserFileVM userFile = new()
                 {
                     File = file,
                     Username = loggedUsername,
+                    DirectoryId = !string.IsNullOrEmpty(dictionaryId.Value) ? Guid.Parse(dictionaryId.Value) : null
                 };
 
                 await _fileService.AddFileByFileWatcher(userFile, relativePath);
