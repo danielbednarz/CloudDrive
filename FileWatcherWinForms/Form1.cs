@@ -24,6 +24,7 @@ namespace FileWatcherWinForms
             InitializeComponent();
             AutoRunOnWindowsStartup();
             WindowAppearance();
+            //username.Text = Properties.Settings.Default["usernameForm"].ToString();
         }
 
 
@@ -153,17 +154,26 @@ namespace FileWatcherWinForms
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             username.Select();
             //this.StartPosition = FormStartPosition.CenterParent;
+            if (Convert.ToBoolean(Properties.Settings.Default["rememberMe"]) == true)
+            {
+                checkBoxRemember.Checked = true;
+                username.Text = Properties.Settings.Default["usernameForm"].ToString();
+                password.Text = Properties.Settings.Default["passwordForm"].ToString();
+                loginUser(username.Text, password.Text);
+            }
 
         }
 
-        private async void login_Click(object sender, EventArgs e)
+        private async void loginUser(string usernamestr, string passwordstr)
         {
             User user = new User();
             UserDTO userDTO = null;
-            user.username = username.Text;
-            user.password = password.Text;
+            user.username = usernamestr;
+            user.password = passwordstr;
             var response = await RestHelper.Login(user);
+
             //Debug.WriteLine(response);
+            //Debug.WriteLine(Properties.Settings.Default["usernameForm"].ToString());
             if (!response.Contains("Nieprawid³owa nazwa u¿ytkownika"))
             {
                 userDTO = JsonSerializer.Deserialize<UserDTO>(response);
@@ -177,7 +187,9 @@ namespace FileWatcherWinForms
                 login.Visible = false;
                 button_edit.Visible = true;
                 observedPath.Visible = true;
+                checkBoxRemember.Visible = false;
                 fileSystemWatcher1.EnableRaisingEvents = true;
+                buttonLogOut.Visible = true;
                 fileSystemWatcher1.IncludeSubdirectories = true;
                 fileSystemWatcher1.NotifyFilter = NotifyFilters.CreationTime
                                  | NotifyFilters.FileName
@@ -192,12 +204,55 @@ namespace FileWatcherWinForms
             }
             else MessageBox.Show(this, "B³êdna nazwa u¿ytkownika, lub has³o.");
 
+            if (checkBoxRemember.Checked == true)
+            {
+                Properties.Settings.Default["rememberMe"] = true;
+                Properties.Settings.Default["usernameForm"] = currentUser;
+                Properties.Settings.Default["passwordForm"] = password.Text;
+                Properties.Settings.Default["usernameForm"] = currentUser;
+                //Properties.Settings.Default["tokenForm"] = currentUser;
+                Properties.Settings.Default.Save();
+            }
+            else
+            {
+                Properties.Settings.Default["rememberMe"] = false;
+                Properties.Settings.Default["usernameForm"] = "";
+                Properties.Settings.Default["passwordForm"] = "";
+                Properties.Settings.Default["usernameForm"] = "";
+                //Properties.Settings.Default["tokenForm"] = "";
+                Properties.Settings.Default.Save();
+            }
+        }
 
+
+        private async void login_Click(object sender, EventArgs e)
+        {
+            loginUser(username.Text, password.Text);
         }
 
         private void label1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void buttonLogOut_Click(object sender, EventArgs e)
+        {
+            nameApp.Visible = true;
+            username.Visible = true;
+            password.Visible = true;
+            login.Visible = true;
+            button_edit.Visible = false;
+            observedPath.Visible = false;
+            checkBoxRemember.Visible = true;
+            fileSystemWatcher1.EnableRaisingEvents = false;
+            currentUser = "";
+            currentTokenUser = "";
+            buttonLogOut.Visible = false;
         }
     }
 }
