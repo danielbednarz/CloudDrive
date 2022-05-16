@@ -7,5 +7,6 @@ namespace CloudDrive.Application
         public IFormFile File { get; set; }
         public string Username { get; set; }
         public int? UserId { get; set; }
+        public Guid? DirectoryId { get; set; }
     }
 }

@@ -7,6 +7,6 @@ namespace CloudDrive.Data.Abstraction
     {
         Task AddDirectory(AddDirectoryVM model);
         bool IsDirectoryUnique(string path);
-        Task<List<DirectorySelectBoxVM>> GetDirectoriesToSelectList(int userId);
+        Task<List<DirectorySelectBoxVM>> GetDirectoriesToSelectList(int userId, string username);
     }
 }

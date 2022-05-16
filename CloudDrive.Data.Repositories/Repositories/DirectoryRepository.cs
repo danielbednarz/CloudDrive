@@ -31,9 +31,9 @@ namespace CloudDrive.Data.Repositories
            return !_context.UserDirectories.Any(x => x.RelativePath == path);
         }
 
-        public async Task<List<DirectorySelectBoxVM>> GetDirectoriesToSelectList(int userId)
+        public async Task<List<DirectorySelectBoxVM>> GetDirectoriesToSelectList(int userId, string username)
         {
-           return await _context.UserDirectories.Where(x => x.UserId == userId).Select(x => new DirectorySelectBoxVM
+           return await _context.UserDirectories.Where(x => x.RelativePath != username && x.RelativePath != $"{username}\\archive" && x.UserId == userId).Select(x => new DirectorySelectBoxVM
            {
                Text = x.Name,
                Value = x.Id,
