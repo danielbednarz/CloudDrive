@@ -39,6 +39,8 @@
             this.username = new System.Windows.Forms.TextBox();
             this.login = new System.Windows.Forms.Button();
             this.nameApp = new System.Windows.Forms.Label();
+            this.checkBoxRemember = new System.Windows.Forms.CheckBox();
+            this.buttonLogOut = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -131,12 +133,37 @@
             this.nameApp.Text = "CloudDrive";
             this.nameApp.Click += new System.EventHandler(this.label1_Click);
             // 
+            // checkBoxRemember
+            // 
+            this.checkBoxRemember.AutoSize = true;
+            this.checkBoxRemember.ForeColor = System.Drawing.Color.White;
+            this.checkBoxRemember.Location = new System.Drawing.Point(313, 258);
+            this.checkBoxRemember.Name = "checkBoxRemember";
+            this.checkBoxRemember.Size = new System.Drawing.Size(102, 19);
+            this.checkBoxRemember.TabIndex = 7;
+            this.checkBoxRemember.Text = "Pamiętaj mnie";
+            this.checkBoxRemember.UseVisualStyleBackColor = true;
+            this.checkBoxRemember.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // buttonLogOut
+            // 
+            this.buttonLogOut.Location = new System.Drawing.Point(626, -3);
+            this.buttonLogOut.Name = "buttonLogOut";
+            this.buttonLogOut.Size = new System.Drawing.Size(75, 23);
+            this.buttonLogOut.TabIndex = 8;
+            this.buttonLogOut.Text = "Wyloguj";
+            this.buttonLogOut.UseVisualStyleBackColor = true;
+            this.buttonLogOut.Visible = false;
+            this.buttonLogOut.Click += new System.EventHandler(this.buttonLogOut_Click);
+            // 
             // CloudDrive
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Silver;
             this.ClientSize = new System.Drawing.Size(704, 301);
+            this.Controls.Add(this.buttonLogOut);
+            this.Controls.Add(this.checkBoxRemember);
             this.Controls.Add(this.nameApp);
             this.Controls.Add(this.login);
             this.Controls.Add(this.username);
@@ -166,5 +193,7 @@
         private TextBox username;
         private TextBox password;
         private Label nameApp;
+        private CheckBox checkBoxRemember;
+        private Button buttonLogOut;
     }
 }
