@@ -55,6 +55,7 @@ namespace CloudDrive.WebAPI
 
 
         [Authorize]
+        [RequestSizeLimit(1000 * 1024 * 1024)]
         [HttpPost("uploadFile")]
         public async Task<IActionResult> UploadFile()
         {
@@ -81,6 +82,34 @@ namespace CloudDrive.WebAPI
                     UserFile addedFile = await _fileService.AddFile(userFile);
                     await _hubContext.Clients.Group(loggedUsername).SendAsync("FileAdded", default, addedFile.Name);
                 }
+            }
+
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPost("uploadFileByFileWatcher")]
+        public async Task<IActionResult> UploadFileByFileWathcer(string relativePath)
+        {
+            var file = Request.Form.Files.FirstOrDefault();
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            if (file.Length > 0)
+            {
+                //var dictionaryId = Request.Form.FirstOrDefault(x => x.Key == "DirectoryId");
+
+                AddUserFileVM userFile = new()
+                {
+                    File = file,
+                    Username = loggedUsername,
+                };
+
+                await _fileService.AddFileByFileWatcher(userFile, relativePath);
             }
 
             return Ok();

@@ -28,7 +28,6 @@
         bordered
         multiple
         class="uploader q-mt-lg"
-        @added="added"
         @removed="clearForm"
         @uploading="onUploading"
         @failed="onError"
@@ -71,9 +70,6 @@ export default {
   methods: {
     ...mapActions(useUploadStore, ["uploadFile", "clearForm"]),
     ...mapActions(useDirectoryStore, ["getDirectoriesToSelectList"]),
-    // added(addedFiles) {
-    //   this.files = addedFiles;
-    // },
     onUploading() {
       this.$q.notify({
         type: "info",
