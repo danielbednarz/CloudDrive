@@ -91,7 +91,7 @@ namespace FileWatcherWinForms
 
         private void fileSystemWatcher1_Deleted(object sender, FileSystemEventArgs e)
         {
-            RestHelper.DeleteFile(e.FullPath, observedPath.Text, currentTokenUser);
+            RestHelper.DeleteFile(e.FullPath, observedPath.Text, currentTokenUser, currentUser);
             SaveLog($"Deleted: {e.FullPath}");
         }
 

@@ -77,9 +77,10 @@ namespace FileWatcherWinForms
             return string.Empty;
         }
 
-        public static async Task<string> DeleteFile(string filePath, string observedPath, string token)
+        public static async Task<string> DeleteFile(string filePath, string observedPath, string token, string username)
         {
             string relativePath = filePath.Replace(observedPath, "");
+            relativePath = $@"{username}{relativePath}";
             using (HttpClient client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);

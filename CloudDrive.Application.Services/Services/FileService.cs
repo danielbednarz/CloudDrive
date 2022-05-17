@@ -110,7 +110,6 @@ namespace CloudDrive.Application
 
         public async Task DeleteFile(string relativePath, string username)
         {
-            relativePath = username + relativePath;
             var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();
 
             var userId = _userRepository.FirstOrDefault(x => x.Username == username)?.Id;
@@ -127,13 +126,14 @@ namespace CloudDrive.Application
         {
             var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();
             var file = await _fileRepository.GetFileById(fileId);
+            var fileDirectory = await _directoryRepository.FirstOrDefaultAsync(x => x.User.Username == username && x.Id == file.DirectoryId);
 
             if (file == null)
             {
                 return null;
             }
 
-            string filePath = $"{fileUploadConfig.SaveFilePath}\\{username}\\{file.Id.ToString()}";
+            string filePath = $"{fileUploadConfig.SaveFilePath}\\{fileDirectory.RelativePath}\\{file.Id.ToString()}";
 
             var bytes = await File.ReadAllBytesAsync(filePath);
 

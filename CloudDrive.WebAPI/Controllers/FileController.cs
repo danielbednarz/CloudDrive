@@ -55,6 +55,7 @@ namespace CloudDrive.WebAPI
 
 
         [Authorize]
+        [RequestSizeLimit(1000 * 1024 * 1024)]
         [HttpPost("uploadFile")]
         public async Task<IActionResult> UploadFile()
         {
