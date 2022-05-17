@@ -84,6 +84,7 @@ namespace CloudDrive.Data.Repositories
         public async Task<List<UserFile>> GetUserDriveFilesToTreeView(Guid mainDirectoryId)
         {
             return await _context.Files
+                .OrderBy(x => x.CreatedDate)
                 .Where(x => x.DirectoryId == mainDirectoryId && !x.IsDeleted)
                 .ToListAsync();
         }

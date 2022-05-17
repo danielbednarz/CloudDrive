@@ -32,7 +32,8 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     ParentDirectoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RelativePath = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    RelativePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -60,7 +61,7 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                     FileVersion = table.Column<long>(type: "bigint", nullable: false),
                     ContentType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RelativePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     DirectoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),

@@ -16,6 +16,7 @@ namespace CloudDrive.Data.Repositories
         public async Task<List<UserDirectory>> GetUserDriveDataToTreeView(string username, Guid mainDirectoryId)
         {
             return await _context.UserDirectories
+                .OrderBy(x => x.CreatedDate)
                 .Where(x => x.ParentDirectoryId == mainDirectoryId && x.RelativePath != username && x.RelativePath != $"{username}\\archive")
                 .ToListAsync();
         }
@@ -28,6 +29,7 @@ namespace CloudDrive.Data.Repositories
                 RelativePath = model.GeneratedPath,
                 UserId = model.UserId.Value,
                 ParentDirectoryId = model.ParentDirectoryId,
+                CreatedDate = DateTime.Now
             });
 
             _context.SaveChanges();

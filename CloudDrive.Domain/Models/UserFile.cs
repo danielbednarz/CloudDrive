@@ -8,7 +8,7 @@
         public long FileVersion { get; set; }
         public string ContentType { get;set; }
         public DateTime CreatedDate { get; set; }
-        public DateTime UpdatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
         public string RelativePath { get; set; }
         public int UserId { get; set; }
         public Guid? DirectoryId { get; set; }

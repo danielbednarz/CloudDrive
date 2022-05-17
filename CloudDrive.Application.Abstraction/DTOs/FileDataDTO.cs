@@ -9,7 +9,7 @@ namespace CloudDrive.Application
         public long Size { get; set; }
         public long FileVersion { get; set; }
         public DateTime CreatedDate { get; set; }
-        public DateTime UpdatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
         public string RelativePath { get; set; }
         public Guid? DirectoryId { get; set; }
         public Guid? ParentDictoryId { get; set; }

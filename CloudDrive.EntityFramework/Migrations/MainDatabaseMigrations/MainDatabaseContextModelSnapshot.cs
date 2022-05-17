@@ -72,6 +72,9 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -123,7 +126,7 @@ namespace CloudDrive.EntityFramework.Migrations.MainDatabaseMigrations
                     b.Property<long>("Size")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
