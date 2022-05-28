@@ -65,5 +65,22 @@ export const useFileStore = defineStore({
           });
       }
     },
+
+    getFileVersions(fileId) {
+      return new Promise((resolve, reject) => {
+        api
+          .get("/File/getFileVersions", {
+            headers: {
+              Authorization: `Bearer ${authenticationStore.currentUser.token}`,
+            },
+            params: {
+              fileId: fileId,
+            },
+          })
+          .then((response) => {
+            resolve(response);
+          });
+      });
+    },
   },
 });

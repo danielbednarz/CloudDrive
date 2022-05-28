@@ -183,5 +183,13 @@ namespace CloudDrive.WebAPI
 
             return File(downloadedFile.Bytes, downloadedFile.UserFile.ContentType, downloadedFile.UserFile.Name);
         }
+
+        [Authorize]
+        [HttpGet("getFileVersions")]
+        public async Task<IActionResult> GetFileVersions(Guid fileId)
+        {
+            List<FileVersionDTO> fileVersions = await _fileService.GetFileVersions(fileId);
+            return Ok(fileVersions);
+        }
     }
 }

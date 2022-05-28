@@ -47,7 +47,7 @@ namespace CloudDrive.Application
 
         private List<UserDirectoryDTO> FromUserFileToDTO(List<UserFile> userFile)
         {
-            return userFile.Where(x => !x.IsDeleted).Select(x => new UserDirectoryDTO()
+            return userFile.Where(x => !x.IsDeleted).GroupBy(x => x.RelativePath).Select(y => y.OrderByDescending(z => z.FileVersion).First()).Select(x => new UserDirectoryDTO()
             {
                 Id = x.Id,
                 Name = x.Name,

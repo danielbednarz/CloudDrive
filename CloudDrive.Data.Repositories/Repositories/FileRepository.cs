@@ -82,6 +82,11 @@ namespace CloudDrive.Data.Repositories
             return await _context.Files.FirstOrDefaultAsync(x => x.Id == fileId);
         }
 
+        public async Task<List<UserFile>> GetAllFileVersions(UserFile file)
+        {
+            return await _context.Files.Where(x => x.RelativePath == file.RelativePath && x.ContentType == file.ContentType).OrderByDescending(x => x.FileVersion).ToListAsync();
+        }
+            
         public async Task<UserFile> MarkFileAsDeleted(string filePath, int? userId)
         {
             var file = await _context.Files

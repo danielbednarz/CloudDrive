@@ -139,5 +139,20 @@ namespace CloudDrive.Application
 
             return new DownloadFileDTO { Bytes = bytes, Path = filePath, UserFile = file };
         }
+
+        public async Task<List<FileVersionDTO>> GetFileVersions(Guid fileId)
+        {
+            UserFile file = await _fileRepository.GetFileById(fileId);
+            List<UserFile> allVersions = await _fileRepository.GetAllFileVersions(file);
+
+            return allVersions.Select(x => new FileVersionDTO()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Size = x.Size,
+                FileVersion = x.FileVersion,
+                CreatedDate = x.CreatedDate
+            }).ToList();
+        }
     }
 }

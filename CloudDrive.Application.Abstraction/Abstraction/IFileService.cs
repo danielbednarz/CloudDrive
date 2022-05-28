@@ -8,6 +8,7 @@ namespace CloudDrive.Application
         Task<UserFile> AddFileByFileWatcher(AddUserFileVM file, string relativePath);
         Task<UserFile> AddFile(AddUserFileVM file);
         Task<DownloadFileDTO> DownloadFile(Guid fileId, string username);
+        Task<List<FileVersionDTO>> GetFileVersions(Guid fileId);
         Task DeleteFile(string relativePath, string username);
     }
 }

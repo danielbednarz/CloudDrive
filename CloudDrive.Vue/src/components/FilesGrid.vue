@@ -48,51 +48,27 @@
                   @click="tryDelete()"
                 />
               </div>
+              <div class="column">
+                <q-btn
+                  icon="fa-solid fa-code-branch"
+                  color="secondary"
+                  text-color="black"
+                  label="Wersje"
+                  class="q-mx-sm"
+                  @click="isVersionsDialogVisible = true"
+                />
+              </div>
             </div>
+            <file-versions-dialog
+              :isVersionsDialogVisible="isVersionsDialogVisible"
+              :fileId="getSelectedObject.id"
+              @dialog-hide="isVersionsDialogVisible = false"
+              v-if="getSelectedObject.isFile"
+            />
           </div>
         </template>
       </q-splitter>
     </div>
-    <!-- <div class="q-pa-md">
-      <q-table
-        grid
-        :rows="files"
-        :columns="columns"
-        row-key="id"
-        v-if="files"
-        no-data-label="Brak plików"
-        no-results-label="Brak danych"
-        loading-label="Ładowanie..."
-        rows-per-page-label="Wielkość strony"
-      >
-        <template v-slot:item="props">
-          <div class="q-pa-xs col-2">
-            <q-card class="file-card bg-secondary text-black">
-              <q-card-actions class="delete-button" text-align="right">
-                <q-btn
-                  flat
-                  round
-                  icon="fa-solid fa-trash"
-                  @click="tryDelete(props.row.relativePath)"
-                  class="small-icon q-ma-xs"
-                />
-              </q-card-actions>
-              <q-card-section class="text-center">
-                <i class="fa-solid fa-file text-h5"></i>
-                <div class="text-body2">{{ props.row.name }}</div>
-              </q-card-section>
-              <q-separator />
-              <q-card-section
-                class="flex flex-center"
-                :style="{ fontSize: 12 + props.row.size / 250000 + 'px' }"
-              >
-                <div>{{ (props.row.size / 1000000).toFixed(2) }} MB</div>
-              </q-card-section>
-            </q-card>
-          </div>
-        </template>
-      </q-table>
-    </div> -->
   </div>
 </template>
 
@@ -100,15 +76,16 @@
 import { useDirectoryStore } from "../stores/directory.js";
 import { useFileStore } from "../stores/file.js";
 import { mapActions } from "pinia";
+import FileVersionsDialog from "./FileVersionsDialog";
 
 export default {
   name: "FileGrid",
   data() {
     return {
-      // files: [],
       userDirectories: [],
       selected: null,
       splitterModel: 50,
+      isVersionsDialogVisible: false,
     };
   },
   computed: {
@@ -152,6 +129,9 @@ export default {
     this.getUserDriveDataToTreeView().then((response) => {
       this.userDirectories = response;
     });
+  },
+  components: {
+    FileVersionsDialog,
   },
 };
 </script>
