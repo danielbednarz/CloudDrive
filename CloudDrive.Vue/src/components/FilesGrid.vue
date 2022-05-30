@@ -63,6 +63,7 @@
               :isVersionsDialogVisible="isVersionsDialogVisible"
               :fileId="getSelectedObject.id"
               @dialog-hide="isVersionsDialogVisible = false"
+              @dialog-hide-selected="onDialogHideSelected"
               v-if="getSelectedObject.isFile"
             />
           </div>
@@ -119,6 +120,17 @@ export default {
       await this.downloadFile({
         id: this.getSelectedObject.id,
         name: this.getSelectedObject.name,
+      });
+    },
+    onDialogHideSelected() {
+      this.isVersionsDialogVisible = false;
+      this.selected = null;
+      this.$q.notify({
+        type: "positive",
+        message: `Wersja wybrana pomyślnie!`,
+      });
+      this.getUserDriveDataToTreeView().then((response) => {
+        this.userDirectories = response;
       });
     },
   },

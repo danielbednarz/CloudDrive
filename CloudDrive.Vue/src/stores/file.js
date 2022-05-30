@@ -82,5 +82,15 @@ export const useFileStore = defineStore({
           });
       });
     },
+    async selectFileVersion(id) {
+      await api.post("/File/selectFileVersion", null, {
+        headers: {
+          Authorization: `Bearer ${authenticationStore.currentUser.token}`,
+        },
+        params: {
+          id: id,
+        },
+      });
+    },
   },
 });

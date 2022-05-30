@@ -191,5 +191,20 @@ namespace CloudDrive.WebAPI
             List<FileVersionDTO> fileVersions = await _fileService.GetFileVersions(fileId);
             return Ok(fileVersions);
         }
+
+        [Authorize]
+        [HttpPost("selectFileVersion")]
+        public async Task<IActionResult> SelectFileVersion(Guid id)
+        {
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            await _fileService.SelectFileVersion(id, loggedUsername);
+            return Ok();
+        }
     }
 }

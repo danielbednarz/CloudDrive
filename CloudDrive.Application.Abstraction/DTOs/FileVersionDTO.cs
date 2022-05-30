@@ -9,5 +9,6 @@ namespace CloudDrive.Application
         public long Size { get; set; }
         public long FileVersion { get; set; }
         public DateTime CreatedDate { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

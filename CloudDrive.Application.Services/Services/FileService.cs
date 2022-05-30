@@ -114,7 +114,7 @@ namespace CloudDrive.Application
 
             var userId = _userRepository.FirstOrDefault(x => x.Username == username)?.Id;
 
-            UserFile file = await _fileRepository.MarkFileAsDeleted(relativePath, userId);
+            UserFile file = await _fileRepository.MarkFileAsDeleted(relativePath, userId, username);
 
             string oldPath = $"{fileUploadConfig.SaveFilePath}\\{relativePath.Replace(file.Name, file.Id.ToString())}";
             string newPath = $"{fileUploadConfig.SaveFilePath}\\{username}\\archive\\{file.Id}";
@@ -151,8 +151,33 @@ namespace CloudDrive.Application
                 Name = x.Name,
                 Size = x.Size,
                 FileVersion = x.FileVersion,
-                CreatedDate = x.CreatedDate
+                CreatedDate = x.CreatedDate,
+                IsDeleted = x.IsDeleted
             }).ToList();
+        }
+
+        public async Task SelectFileVersion(Guid fileId, string username)
+        {
+            var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();
+
+            var userId = _userRepository.FirstOrDefault(x => x.Username == username)?.Id;
+
+            UserFile newVersion = _fileRepository.FirstOrDefault(x => x.Id == fileId);
+            UserFile currentVersion = _fileRepository.FirstOrDefault(x => x.Name == newVersion.Name && x.ContentType == newVersion.ContentType && !x.IsDeleted);
+
+            string currentRelativePath = currentVersion.RelativePath;
+            Guid? currentDirectoryId = currentVersion.DirectoryId;
+
+            await _fileRepository.MarkFileAsDeleted(currentRelativePath, userId, username);
+            await _fileRepository.MarkFileAsCurrentById(fileId, userId, currentRelativePath, currentDirectoryId);
+
+            string oldPath = $"{fileUploadConfig.SaveFilePath}\\{currentRelativePath.Replace(currentVersion.Name, currentVersion.Id.ToString())}";
+            string newPath = $"{fileUploadConfig.SaveFilePath}\\{username}\\archive\\{currentVersion.Id}";
+            File.Move(oldPath, newPath);
+
+            oldPath = $"{fileUploadConfig.SaveFilePath}\\{username}\\archive\\{fileId}";
+            newPath = $"{fileUploadConfig.SaveFilePath}\\{currentRelativePath.Replace(currentVersion.Name, fileId.ToString())}";
+            File.Move(oldPath, newPath);
         }
     }
 }

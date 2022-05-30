@@ -84,10 +84,10 @@ namespace CloudDrive.Data.Repositories
 
         public async Task<List<UserFile>> GetAllFileVersions(UserFile file)
         {
-            return await _context.Files.Where(x => x.RelativePath == file.RelativePath && x.ContentType == file.ContentType).OrderByDescending(x => x.FileVersion).ToListAsync();
+            return await _context.Files.Where(x => x.Name == file.Name && x.ContentType == file.ContentType).OrderByDescending(x => x.FileVersion).ToListAsync();
         }
             
-        public async Task<UserFile> MarkFileAsDeleted(string filePath, int? userId)
+        public async Task<UserFile> MarkFileAsDeleted(string filePath, int? userId, string username)
         {
             var file = await _context.Files
                 .Where(x => x.RelativePath == filePath && x.User.Id == userId && x.IsDeleted == false)
@@ -95,13 +95,25 @@ namespace CloudDrive.Data.Repositories
                 .FirstOrDefaultAsync();
 
             file.IsDeleted = true;
-            file.RelativePath = @$"archive\{file.Name}";
+            file.RelativePath = @$"{username}\archive\{file.Name}";
             file.DirectoryId = _context.UserDirectories.FirstOrDefault(x => x.UserId == userId && x.Name == "archive").Id;
 
             _context.Files.Update(file);
             await _context.SaveChangesAsync();
 
             return file;
+        }
+            
+        public async Task MarkFileAsCurrentById(Guid fileId, int? userId, string currentRelativePath, Guid? currentDirectoryId)
+        {
+            var file = await _context.Files.Where(x => x.Id == fileId).FirstOrDefaultAsync();
+
+            file.IsDeleted = false;
+            file.RelativePath = currentRelativePath;
+            file.DirectoryId = currentDirectoryId;
+
+            _context.Files.Update(file);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<List<UserFile>> GetUserDriveFilesToTreeView(Guid mainDirectoryId)
@@ -111,6 +123,5 @@ namespace CloudDrive.Data.Repositories
                 .Where(x => x.DirectoryId == mainDirectoryId && !x.IsDeleted)
                 .ToListAsync();
         }
-
     }
 }

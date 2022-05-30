@@ -20,13 +20,16 @@
         :key="index"
       >
         <q-icon
-          name="fa-solid fa-pen-to-square"
+          :name="version.isDeleted ? 'fa-solid fa-xmark' : 'fa-solid fa-check'"
           color="primary"
           size="36px"
           class="q-my-md"
         />
-        <div class="q-mt-md text-center text-black">
-          <p class="text-h5">{{ version.name }}</p>
+        <div class="text-center text-black">
+          <p class="text-body2">
+            {{ version.isDeleted ? "Wersja nieaktualna" : "Wersja aktualna" }}
+          </p>
+          <p class="q-mt-lg text-h5">{{ version.name }}</p>
           <p class="text-body2">
             To jest wersja numer {{ version.fileVersion + 1 }}
           </p>
@@ -42,6 +45,7 @@
             text-color="secondary"
             label="Wybierz"
             class="q-my-sm"
+            @click="selectVersion(version.id)"
           />
         </div>
       </q-carousel-slide>
@@ -82,10 +86,16 @@ export default {
     },
   },
   methods: {
-    ...mapActions(useFileStore, ["getFileVersions"]),
+    ...mapActions(useFileStore, ["getFileVersions", "selectFileVersion"]),
     onDialogHide() {
       this.$emit("dialog-hide");
       this.fileVersions = [];
+    },
+    selectVersion(id) {
+      this.selectFileVersion(id).then(() => {
+        this.$emit("dialog-hide-selected");
+        this.fileVersions = [];
+      });
     },
   },
   mounted() {
