@@ -84,7 +84,7 @@ export default {
   },
   computed: {
     ...mapWritableState(useAuthenticationStore, ["form"]),
-    ...mapState(useAuthenticationStore, ["currentUser"]),
+    ...mapState(useAuthenticationStore, ["currentUser", "signalrConnection"]),
   },
   methods: {
     ...mapActions(useAuthenticationStore, ["clearForm", "register"]),
@@ -95,7 +95,8 @@ export default {
     },
     async tryRegister() {
       await this.register();
-      connectToHub(this.currentUser.username, this.$q);
+      let connection = connectToHub(this.currentUser.username, this.$q);
+      this.signalrConnection = connection;
       this.closePopover();
     },
   },

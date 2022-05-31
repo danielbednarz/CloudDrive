@@ -14,6 +14,8 @@ const connectToHub = (username, q) => {
   });
 
   connection.start();
+
+  return connection;
 };
 
 export { connectToHub };

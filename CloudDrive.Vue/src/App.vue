@@ -10,7 +10,10 @@ import { connectToHub } from "./hubs/file-hub";
 export default {
   name: "App",
   computed: {
-    ...mapWritableState(useAuthenticationStore, ["currentUser"]),
+    ...mapWritableState(useAuthenticationStore, [
+      "currentUser",
+      "signalrConnection",
+    ]),
   },
   mounted() {
     if (localStorage.user) {
@@ -18,7 +21,8 @@ export default {
       this.currentUser.username = localStorageUser.username;
       this.currentUser.token = localStorageUser.token;
 
-      connectToHub(localStorageUser.username, this.$q);
+      let connection = connectToHub(localStorageUser.username, this.$q);
+      this.signalrConnection = connection;
     }
   },
 };
