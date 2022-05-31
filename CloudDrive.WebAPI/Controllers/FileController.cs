@@ -207,9 +207,9 @@ namespace CloudDrive.WebAPI
             return Ok();
         }
 
-        //[Authorize]
-        [HttpGet("downloadDirectory"), AllowAnonymous]
-        public async Task<IActionResult> DownloadDirectory(Guid id)
+        [Authorize]
+        [HttpGet("downloadDirectory")]
+        public async Task<IActionResult> DownloadDirectory(Guid directoryId)
         {
             var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -218,7 +218,7 @@ namespace CloudDrive.WebAPI
                 return NotFound("Błąd przy próbie znalezienia użytkownika");
             }
 
-            DownloadDirectoryDTO downloadDirectoryDTO = await _directoryService.CreateCompressedDirectory(id, loggedUsername);
+            DownloadDirectoryDTO downloadDirectoryDTO = await _directoryService.CreateCompressedDirectory(directoryId, loggedUsername);
 
             if (downloadDirectoryDTO == null)
             {

@@ -59,5 +59,32 @@ export const useDirectoryStore = defineStore({
         });
       }
     },
+    async downloadDirectory({ id, name }) {
+      if (
+        authenticationStore.currentUser &&
+        authenticationStore.currentUser.token
+      ) {
+        await api
+          .get("/File/downloadDirectory", {
+            responseType: "blob",
+            headers: {
+              Authorization: `Bearer ${authenticationStore.currentUser.token}`,
+            },
+            params: {
+              directoryId: id,
+            },
+          })
+          .then((response) => {
+            const blob = new Blob([response.data], {
+              type: response.data.type,
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = name;
+            link.click();
+            URL.revokeObjectURL(link.href);
+          });
+      }
+    },
   },
 });

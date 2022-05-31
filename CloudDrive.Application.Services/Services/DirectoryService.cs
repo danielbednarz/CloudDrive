@@ -125,30 +125,30 @@ namespace CloudDrive.Application
         {
             string mainPath = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>().SaveFilePath;
 
-            UserDirectory downloadDirectory = await _directoryRepository.GetDirectoryById(id);
+            UserDirectory directory = await _directoryRepository.GetDirectoryById(id);
 
-            string downloadDirectoryPath = Path.Combine(mainPath, downloadDirectory.RelativePath);
-            string downloadCompressedDirectoryPath = downloadDirectoryPath + ".zip";
+            string directoryPath = Path.Combine(mainPath, directory.RelativePath);
+            string compressedDirectoryPath = directoryPath + ".zip";
 
-            using FileStream zipFile = File.Open(downloadCompressedDirectoryPath, FileMode.Create);
-             
-            await AddFilesToDownloadCompressedDirectory(id, mainPath, zipFile);
+            using FileStream zipFile = File.Open(compressedDirectoryPath, FileMode.Create);
+            
+            await AddFilesToCompressedDirectory(id, mainPath, zipFile);
 
-            string[] childDirectoriesPaths = GetChildDirectoriesPaths(downloadDirectoryPath);
+            string[] childDirectoriesPaths = GetChildDirectoriesPaths(directoryPath);
             foreach (var childDirectoryPath in childDirectoriesPaths)
             {
                 string relativeChildDirectoryPath = childDirectoryPath.Substring(mainPath.Length + 1);  // stworzenie ścieżki względnej
 
                 UserDirectory subDirectory = await _directoryRepository.GetDirectoryByRelativePath(relativeChildDirectoryPath, username);
 
-                await AddFilesToParentCompressedDirectory(subDirectory.Id, mainPath, downloadCompressedDirectoryPath);
+                await AddFilesToParentCompressedDirectory(subDirectory, mainPath, compressedDirectoryPath);
             }
 
             try
             { 
-                byte[] fileContent = File.ReadAllBytes(downloadCompressedDirectoryPath);
+                byte[] fileContent = File.ReadAllBytes(compressedDirectoryPath);
 
-                return new DownloadDirectoryDTO { Bytes = fileContent, DirectoryName = downloadDirectory.Name + ".zip" };
+                return new DownloadDirectoryDTO { Bytes = fileContent, DirectoryName = directory.Name + ".zip" };
             }
             catch (Exception ex)
             {
@@ -156,11 +156,11 @@ namespace CloudDrive.Application
             }
         }
 
-        private async Task AddFilesToDownloadCompressedDirectory(Guid directoryId, string mainPath, FileStream zipFile)
+        private async Task AddFilesToCompressedDirectory(Guid directoryId, string mainPath, FileStream zipFile)
         {
-            var filesFromDirectory = await _directoryRepository.GetFilesFromDirectory(directoryId);
-
             using var archive = new ZipArchive(zipFile, ZipArchiveMode.Create);
+
+            var filesFromDirectory = await _directoryRepository.GetFilesFromDirectory(directoryId);
             foreach (var file in filesFromDirectory)
             {
                 var absolutePathToFileWithFileName = Path.Combine(mainPath, file.RelativePath);
@@ -169,15 +169,15 @@ namespace CloudDrive.Application
                 archive.CreateEntryFromFile(absolutePathToFileWithId, file.Name);
             }
 
-            archive.Dispose();
+            archive.Dispose(); 
         }
 
-        private async Task AddFilesToParentCompressedDirectory(Guid directoryId, string mainPath, string downloadCompressedDirectoryPath)
+        private async Task AddFilesToParentCompressedDirectory(UserDirectory directory, string mainPath, string compressedDirectoryPath)
         {
-            var filesFromDirectory = await _directoryRepository.GetFilesFromDirectory(directoryId);
-
-            using FileStream zipFile = File.Open(downloadCompressedDirectoryPath, FileMode.OpenOrCreate);
+            using FileStream zipFile = File.Open(compressedDirectoryPath, FileMode.OpenOrCreate);
             using var archive = new ZipArchive(zipFile, ZipArchiveMode.Update);
+
+            var filesFromDirectory = await _directoryRepository.GetFilesFromDirectory(directory.Id);
             foreach (var file in filesFromDirectory)
             {
                 var absolutePathToFileWithFileName = Path.Combine(mainPath, file.RelativePath);

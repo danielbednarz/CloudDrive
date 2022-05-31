@@ -59,6 +59,21 @@
                 />
               </div>
             </div>
+            <div
+              class="row justify-center q-my-xl"
+              v-if="!getSelectedObject.isFile"
+            >
+              <div class="column">
+                <q-btn
+                  icon="fa-solid fa-file-zipper"
+                  color="secondary"
+                  text-color="black"
+                  label="Pobierz"
+                  class="q-mx-sm"
+                  @click="tryDownloadDirectory()"
+                />
+              </div>
+            </div>
             <file-versions-dialog
               :isVersionsDialogVisible="isVersionsDialogVisible"
               :fileId="getSelectedObject.id"
@@ -103,6 +118,7 @@ export default {
     ...mapActions(useDirectoryStore, [
       "getDirectoriesToSelectList",
       "getUserDriveDataToTreeView",
+      "downloadDirectory",
     ]),
     ...mapActions(useFileStore, ["getUserFiles", "deleteFile", "downloadFile"]),
     async tryDelete() {
@@ -118,6 +134,12 @@ export default {
     },
     async tryDownload() {
       await this.downloadFile({
+        id: this.getSelectedObject.id,
+        name: this.getSelectedObject.name,
+      });
+    },
+    async tryDownloadDirectory() {
+      await this.downloadDirectory({
         id: this.getSelectedObject.id,
         name: this.getSelectedObject.name,
       });
