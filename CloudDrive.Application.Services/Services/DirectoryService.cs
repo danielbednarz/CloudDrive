@@ -2,6 +2,7 @@
 using CloudDrive.Data.Abstraction;
 using CloudDrive.Domain;
 using Microsoft.Extensions.Configuration;
+using System.IO.Compression;
 using System.Text.RegularExpressions;
 
 namespace CloudDrive.Application
@@ -47,15 +48,30 @@ namespace CloudDrive.Application
 
         private List<UserDirectoryDTO> FromUserFileToDTO(List<UserFile> userFile)
         {
-            return userFile.Where(x => !x.IsDeleted).GroupBy(x => x.RelativePath).Select(y => y.OrderByDescending(z => z.FileVersion).First()).Select(x => new UserDirectoryDTO()
+            var userFiles = userFile.Where(x => !x.IsDeleted).GroupBy(x => x.RelativePath).Select(y => y.OrderByDescending(z => z.FileVersion).First()).Select(x => new UserDirectoryDTO()
             {
                 Id = x.Id,
                 Name = x.Name,
                 RelativePath = x.RelativePath,
-                Icon = "fa-solid fa-file",
+                Icon = GetIconToFileType(x.ContentType),
                 IsFile = true
             }).ToList();
+
+            return userFiles;
         }
+
+        private static string GetIconToFileType(string contentType) =>
+        contentType switch
+        {
+            "application/pdf" => "fa-solid fa-file-pdf",
+            "image/png" or "image/jpeg" or "image/bmp" => "fa-solid fa-file-image",
+            "video/avi" or "video/mp4" or "video/x-msvideo" => "fa-solid fa-file-video",
+            "application/vnd.rar" or "application/x-zip-compressed" => "fa-solid fa-file-zipper",
+            "application/msword" or "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => "fa-solid fa-file-word",
+            "audio/mpeg" => "fa-solid fa-file-audio",
+            "text/plain" => "fa-solid fa-file-lines",
+            _ => "fa-solid fa-file",
+        };
 
         private string CreateDirectoryOnServer(string userChosenPath)
         {
@@ -103,6 +119,79 @@ namespace CloudDrive.Application
         {
             AppUser user = _userRepository.FirstOrDefault(x => x.Username == username) ?? throw new Exception("Użytkownik nie istnieje");
             return await _directoryRepository.GetDirectoriesToSelectList(user.Id, username);
+        }
+
+        public async Task<DownloadDirectoryDTO> CreateCompressedDirectory(Guid id, string username)
+        {
+            string mainPath = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>().SaveFilePath;
+
+            UserDirectory downloadDirectory = await _directoryRepository.GetDirectoryById(id);
+
+            string downloadDirectoryPath = Path.Combine(mainPath, downloadDirectory.RelativePath);
+            string downloadCompressedDirectoryPath = downloadDirectoryPath + ".zip";
+
+            using FileStream zipFile = File.Open(downloadCompressedDirectoryPath, FileMode.Create);
+             
+            await AddFilesToDownloadCompressedDirectory(id, mainPath, zipFile);
+
+            string[] childDirectoriesPaths = GetChildDirectoriesPaths(downloadDirectoryPath);
+            foreach (var childDirectoryPath in childDirectoriesPaths)
+            {
+                string relativeChildDirectoryPath = childDirectoryPath.Substring(mainPath.Length + 1);  // stworzenie ścieżki względnej
+
+                UserDirectory subDirectory = await _directoryRepository.GetDirectoryByRelativePath(relativeChildDirectoryPath, username);
+
+                await AddFilesToParentCompressedDirectory(subDirectory.Id, mainPath, downloadCompressedDirectoryPath);
+            }
+
+            try
+            { 
+                byte[] fileContent = File.ReadAllBytes(downloadCompressedDirectoryPath);
+
+                return new DownloadDirectoryDTO { Bytes = fileContent, DirectoryName = downloadDirectory.Name + ".zip" };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        private async Task AddFilesToDownloadCompressedDirectory(Guid directoryId, string mainPath, FileStream zipFile)
+        {
+            var filesFromDirectory = await _directoryRepository.GetFilesFromDirectory(directoryId);
+
+            using var archive = new ZipArchive(zipFile, ZipArchiveMode.Create);
+            foreach (var file in filesFromDirectory)
+            {
+                var absolutePathToFileWithFileName = Path.Combine(mainPath, file.RelativePath);
+                var absolutePathToFileWithId = absolutePathToFileWithFileName.Replace(file.Name, file.Id.ToString());   //nazwa pliku z Guid -> FileName
+
+                archive.CreateEntryFromFile(absolutePathToFileWithId, file.Name);
+            }
+
+            archive.Dispose();
+        }
+
+        private async Task AddFilesToParentCompressedDirectory(Guid directoryId, string mainPath, string downloadCompressedDirectoryPath)
+        {
+            var filesFromDirectory = await _directoryRepository.GetFilesFromDirectory(directoryId);
+
+            using FileStream zipFile = File.Open(downloadCompressedDirectoryPath, FileMode.OpenOrCreate);
+            using var archive = new ZipArchive(zipFile, ZipArchiveMode.Update);
+            foreach (var file in filesFromDirectory)
+            {
+                var absolutePathToFileWithFileName = Path.Combine(mainPath, file.RelativePath);
+                var absolutePathToFileWithId = absolutePathToFileWithFileName.Replace(file.Name, file.Id.ToString());   //nazwa pliku z Guid -> FileName
+
+                archive.CreateEntryFromFile(absolutePathToFileWithId, file.Name);
+            }
+
+            archive.Dispose();
+        }
+
+        private static string[] GetChildDirectoriesPaths(string directoryPath)
+        {
+            return Directory.GetDirectories(directoryPath, "*", SearchOption.AllDirectories);
         }
 
     }

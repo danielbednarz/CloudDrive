@@ -206,5 +206,26 @@ namespace CloudDrive.WebAPI
             await _fileService.SelectFileVersion(id, loggedUsername);
             return Ok();
         }
+
+        //[Authorize]
+        [HttpGet("downloadDirectory"), AllowAnonymous]
+        public async Task<IActionResult> DownloadDirectory(Guid id)
+        {
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            DownloadDirectoryDTO downloadDirectoryDTO = await _directoryService.CreateCompressedDirectory(id, loggedUsername);
+
+            if (downloadDirectoryDTO == null)
+            {
+                return NotFound("Błąd przy próbie pobrania folderu");
+            }
+
+            return File(downloadDirectoryDTO.Bytes, "application/zip", downloadDirectoryDTO.DirectoryName);
+        }
     }
 }
