@@ -213,28 +213,48 @@ namespace FileWatcherWinForms
                                  | NotifyFilters.FileName
                                  | NotifyFilters.LastWrite
                                  | NotifyFilters.Size;
-                if (String.IsNullOrEmpty(observedPath.Text)){
+                if (String.IsNullOrEmpty(observedPath.Text))
+                {
                     fileSystemWatcher1.EnableRaisingEvents = false;
                 }
                 else
                 {
                     fileSystemWatcher1.EnableRaisingEvents = true;
-                   // System.IO.DriveInfo di = new System.IO.DriveInfo(observedPath.Text);
+                    // System.IO.DriveInfo di = new System.IO.DriveInfo(observedPath.Text);
                     //System.IO.DirectoryInfo dirInfo = new System.IO.DirectoryInfo(observedPath.Text);
                     //System.IO.FileInfo[] fileNames = dirInfo.GetFiles();
                     //System.IO.DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
-                    string[] entries = Directory.GetFileSystemEntries(observedPath.Text, "*", SearchOption.AllDirectories);
-                    var response2 = await RestHelper.GetUserFile(userDTO.token,userDTO.username);
+                    buttonLogOut.Visible = true;
+                    currentUser = userDTO.username;
+                    currentTokenUser = userDTO.token;
+                    string[] entries = Directory.GetFileSystemEntries(observedPath.Text, "*.*", SearchOption.AllDirectories);
+                    var response2 = await RestHelper.GetUserFile(userDTO.token, userDTO.username);
                     List<FileDTO> convert = JsonConvert.DeserializeObject<List<FileDTO>>(response2) as List<FileDTO>;
-                    foreach(string str in entries)
+                    foreach (FileDTO file in convert)
                     {
+                        foreach (string str in entries)
+                        {
+                            FileAttributes att = File.GetAttributes(str);
+                            if (!((att & FileAttributes.Directory) == FileAttributes.Directory))
+                            {
+                                string relativePathFromServer = file.RelativePath.Replace((currentUser+"\\"), "");
+                                string relativePathCurrentFile = str.Replace((Properties.Settings.Default["cloudDriveObserved"].ToString()+"\\"), "");
+                                if(relativePathFromServer == relativePathCurrentFile)
+                                {
+                                    DateTime modification = File.GetLastWriteTime(str);
+                                    if(modification < file.UpdatedDate)
+                                    {
 
+                                    }
+                                }
+
+                            }
+                                //string relativePath = filePath.Replace(observedPath, "");
+                        }
                     }
                     int p = 0;
                 }
-                buttonLogOut.Visible = true;
-                currentUser = userDTO.username;
-                currentTokenUser = userDTO.token;
+         
                 //var res = await RestHelper.UploadFile("E:\\PlikTestowy.txt", userDTO.token);
                 //Debug.WriteLine("Witaj");
                 //Debug.WriteLine(res);
