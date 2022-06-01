@@ -129,7 +129,18 @@ namespace FileWatcherWinForms
             button_save.Visible = false;
             button_edit.Visible = true;
             observedPath.ReadOnly = true;
-            fileSystemWatcher1.Path = observedPath.Text;
+            if (!String.IsNullOrEmpty(observedPath.Text))
+            {
+                Properties.Settings.Default["cloudDriveObserved"] = observedPath.Text;
+                fileSystemWatcher1.Path = observedPath.Text;
+                fileSystemWatcher1.EnableRaisingEvents = true;
+            }
+            else
+            {
+                Properties.Settings.Default["cloudDriveObserved"] = "";
+            }
+            Properties.Settings.Default.Save();
+
         }
 
         private void AutoRunOnWindowsStartup()
@@ -159,6 +170,7 @@ namespace FileWatcherWinForms
                 checkBoxRemember.Checked = true;
                 username.Text = Properties.Settings.Default["usernameForm"].ToString();
                 password.Text = Properties.Settings.Default["passwordForm"].ToString();
+                observedPath.Text = Properties.Settings.Default["cloudDriveObserved"].ToString();
                 loginUser(username.Text, password.Text);
             }
 
@@ -188,14 +200,19 @@ namespace FileWatcherWinForms
                 button_edit.Visible = true;
                 observedPath.Visible = true;
                 checkBoxRemember.Visible = false;
-                fileSystemWatcher1.EnableRaisingEvents = true;
-                buttonLogOut.Visible = true;
                 fileSystemWatcher1.IncludeSubdirectories = true;
                 fileSystemWatcher1.NotifyFilter = NotifyFilters.CreationTime
                                  | NotifyFilters.FileName
                                  | NotifyFilters.LastWrite
                                  | NotifyFilters.Size;
-
+                if (String.IsNullOrEmpty(observedPath.Text)){
+                    fileSystemWatcher1.EnableRaisingEvents = false;
+                }
+                else
+                {
+                    fileSystemWatcher1.EnableRaisingEvents = true;
+                }
+                buttonLogOut.Visible = true;
                 currentUser = userDTO.username;
                 currentTokenUser = userDTO.token;
                 //var res = await RestHelper.UploadFile("E:\\PlikTestowy.txt", userDTO.token);
