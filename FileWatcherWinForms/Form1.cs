@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Microsoft.Win32;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+
 
 namespace FileWatcherWinForms
 {
@@ -67,12 +69,15 @@ namespace FileWatcherWinForms
             }
         }
 
-        private void fileSystemWatcher1_Changed(object sender, FileSystemEventArgs e)
+        private async void fileSystemWatcher1_Changed(object sender, FileSystemEventArgs e)
         {
             if (e.ChangeType != WatcherChangeTypes.Changed)
             {
                 return;
             }
+            string filename = Path.GetFileName(e.FullPath);
+            RestHelper.DeleteFile(e.FullPath, observedPath.Text, currentTokenUser, currentUser);
+            await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename, observedPath.Text);
             SaveLog($"Changed: {e.FullPath}");
 
         }
@@ -95,8 +100,11 @@ namespace FileWatcherWinForms
             SaveLog($"Deleted: {e.FullPath}");
         }
 
-        private void fileSystemWatcher1_Renamed(object sender, RenamedEventArgs e)
+        private async void fileSystemWatcher1_Renamed(object sender, RenamedEventArgs e)
         {
+            string filename = Path.GetFileName(e.FullPath);
+            RestHelper.DeleteFile(e.FullPath, observedPath.Text, currentTokenUser, currentUser);
+            await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename, observedPath.Text);
             SaveLog($"Renamed:");
             SaveLog($"    Old: {e.OldFullPath}");
             SaveLog($"    New: {e.FullPath}");
@@ -188,7 +196,7 @@ namespace FileWatcherWinForms
             //Debug.WriteLine(Properties.Settings.Default["usernameForm"].ToString());
             if (!response.Contains("Nieprawid³owa nazwa u¿ytkownika"))
             {
-                userDTO = JsonSerializer.Deserialize<UserDTO>(response);
+                userDTO = System.Text.Json.JsonSerializer.Deserialize<UserDTO>(response);
             }
             //Debug.WriteLine(userDTO.token);
             if (userDTO != null && userDTO.token != null && userDTO.username != null)
@@ -211,6 +219,18 @@ namespace FileWatcherWinForms
                 else
                 {
                     fileSystemWatcher1.EnableRaisingEvents = true;
+                   // System.IO.DriveInfo di = new System.IO.DriveInfo(observedPath.Text);
+                    //System.IO.DirectoryInfo dirInfo = new System.IO.DirectoryInfo(observedPath.Text);
+                    //System.IO.FileInfo[] fileNames = dirInfo.GetFiles();
+                    //System.IO.DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
+                    string[] entries = Directory.GetFileSystemEntries(observedPath.Text, "*", SearchOption.AllDirectories);
+                    var response2 = await RestHelper.GetUserFile(userDTO.token,userDTO.username);
+                    List<FileDTO> convert = JsonConvert.DeserializeObject<List<FileDTO>>(response2) as List<FileDTO>;
+                    foreach(string str in entries)
+                    {
+
+                    }
+                    int p = 0;
                 }
                 buttonLogOut.Visible = true;
                 currentUser = userDTO.username;
@@ -239,6 +259,8 @@ namespace FileWatcherWinForms
                 //Properties.Settings.Default["tokenForm"] = "";
                 Properties.Settings.Default.Save();
             }
+            
+            //System.IO.FileInfo[] fileNames = dirInfo.GetFiles("*.*");
         }
 
 

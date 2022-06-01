@@ -7,6 +7,10 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace FileWatcherWinForms
 {
@@ -98,5 +102,28 @@ namespace FileWatcherWinForms
             }
             return string.Empty;
         }
+
+        public static async Task<string> GetUserFile(string token, string username)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                using (HttpResponseMessage res = await client.GetAsync(baseURL + "File/getUserFiles"))
+                {
+                    using (HttpContent content = res.Content)
+                    {
+                        string data = await content.ReadAsStringAsync();
+                       
+                        if (data != null)
+                        {
+                            var files = new List<FileDTO>();
+                            return data;
+                        }
+                    }
+                }
+            }
+            return string.Empty;
+        }
+
     }
 }
