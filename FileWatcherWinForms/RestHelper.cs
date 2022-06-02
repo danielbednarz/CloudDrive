@@ -126,7 +126,7 @@ namespace FileWatcherWinForms
             return string.Empty;
         }
 
-        public static async Task<string> DownloadFile(string token, Guid idFile, string fileName)
+        public static async Task<string> DownloadFile(string token, Guid idFile, string filePath)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -139,7 +139,12 @@ namespace FileWatcherWinForms
 
                         if (data != null)
                         {
-                            var fileInfo = new FileInfo(fileName);
+                            var fileInfo = new FileInfo(filePath);
+                            string relativePath = Path.GetDirectoryName(filePath);
+                            if (!Directory.Exists(relativePath))
+                            {
+                                DirectoryInfo di = Directory.CreateDirectory(relativePath);
+                            }
                             using (var fileStream = fileInfo.OpenWrite())
                             {
                                 await data.CopyToAsync(fileStream);
