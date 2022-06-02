@@ -194,5 +194,46 @@ namespace CloudDrive.Application
             return Directory.GetDirectories(directoryPath, "*", SearchOption.AllDirectories);
         }
 
+        public async Task<DownloadDirectoryDTO> CreateSelectedFilesDirectory(List<Guid> fileIds, string username)
+        {
+            string mainPath = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>().SaveFilePath;
+
+            UserDirectory directory = await _directoryRepository.GetDirectoryByRelativePath(username, username);    // pobranie głównego katalogu danego użytkownika
+
+            string directoryPath = Path.Combine(mainPath, directory.RelativePath);
+            string compressedDirectoryPath = directoryPath + ".zip";
+
+            using FileStream zipFile = File.Open(compressedDirectoryPath, FileMode.Create);
+
+            await AddSelectedFilesToDirectory(zipFile, fileIds, mainPath);
+
+            try
+            { 
+                byte[] fileContent = File.ReadAllBytes(compressedDirectoryPath);
+
+                return new DownloadDirectoryDTO { Bytes = fileContent, DirectoryName = "Selected_files.zip" };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        private async Task AddSelectedFilesToDirectory(FileStream zipFile, List<Guid> fileIds, string mainPath)
+        {
+            using var archive = new ZipArchive(zipFile, ZipArchiveMode.Create);
+
+            foreach (var fileId in fileIds)
+            {
+                UserFile file = await _fileRepository.GetFileById(fileId);
+
+                var absolutePathToFileWithFileName = Path.Combine(mainPath, file.RelativePath);
+                var absolutePathToFileWithId = absolutePathToFileWithFileName.Replace(file.Name, file.Id.ToString());   //nazwa pliku z Guid -> FileName
+                
+                archive.CreateEntryFromFile(absolutePathToFileWithId, file.Name);
+            }
+
+            archive.Dispose();  // zwolnienie obiektu, by nie doprowadzić do deadlock
+        }
     }
 }

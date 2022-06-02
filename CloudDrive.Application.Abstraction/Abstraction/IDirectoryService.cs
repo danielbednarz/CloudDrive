@@ -8,5 +8,6 @@ namespace CloudDrive.Application
         Task AddDirectory(AddDirectoryVM model, string username);
         Task<List<DirectorySelectBoxVM>> GetDirectoriesToSelectList(string username);
         Task<DownloadDirectoryDTO> CreateCompressedDirectory(Guid id, string username);
+        Task<DownloadDirectoryDTO> CreateSelectedFilesDirectory(List<Guid> fileIds, string username);
     }
 }
