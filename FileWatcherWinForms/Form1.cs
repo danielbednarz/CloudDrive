@@ -75,9 +75,9 @@ namespace FileWatcherWinForms
             {
                 return;
             }
-            string filename = Path.GetFileName(e.FullPath);
-            RestHelper.DeleteFile(e.FullPath, observedPath.Text, currentTokenUser, currentUser);
-            await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename, observedPath.Text);
+            //string filename = Path.GetFileName(e.FullPath);
+            //RestHelper.DeleteFile(e.FullPath, observedPath.Text, currentTokenUser, currentUser);
+            //await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename, observedPath.Text);
             SaveLog($"Changed: {e.FullPath}");
 
         }
@@ -102,9 +102,9 @@ namespace FileWatcherWinForms
 
         private async void fileSystemWatcher1_Renamed(object sender, RenamedEventArgs e)
         {
-            string filename = Path.GetFileName(e.FullPath);
-            RestHelper.DeleteFile(e.FullPath, observedPath.Text, currentTokenUser, currentUser);
-            await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename, observedPath.Text);
+            //string filename = Path.GetFileName(e.FullPath);
+            //RestHelper.DeleteFile(e.FullPath, observedPath.Text, currentTokenUser, currentUser);
+            //await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename, observedPath.Text);
             SaveLog($"Renamed:");
             SaveLog($"    Old: {e.OldFullPath}");
             SaveLog($"    New: {e.FullPath}");
@@ -184,6 +184,89 @@ namespace FileWatcherWinForms
 
         }
 
+        private async void checkFile(string token, string username)
+        {
+            string[] entries = Directory.GetFileSystemEntries(observedPath.Text, "*.*", SearchOption.AllDirectories);
+            //string[] newRelativePathEntries = ne;
+            List<String> newRelativePathEntries = new List<String>();
+            List<String> newRelativePathFromServer = new List<String>();
+            var response2 = await RestHelper.GetUserFile(token, username);
+            List<FileDTO> convert = JsonConvert.DeserializeObject<List<FileDTO>>(response2) as List<FileDTO>;
+            Boolean downloadFile = true;
+            foreach (var entry in entries)
+            {
+                FileAttributes att = File.GetAttributes(entry);
+                if (!((att & FileAttributes.Directory) == FileAttributes.Directory))
+                {
+                    string relativePathCurrentFile = entry.Replace((Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\"), "");
+                    newRelativePathEntries.Add(entry);
+                }
+            }
+
+            foreach (FileDTO file in convert)
+            {
+                string relativePathFromServer = file.RelativePath.Replace((currentUser + "\\"), "");
+                newRelativePathFromServer.Add(relativePathFromServer);
+            }
+
+                foreach (FileDTO file in convert)
+            {
+                string relativePathFromServer = file.RelativePath.Replace((currentUser + "\\"), "");
+                foreach (string str in entries)
+                {
+                    FileAttributes att = File.GetAttributes(str);
+                    if (!((att & FileAttributes.Directory) == FileAttributes.Directory))
+                    {
+                        
+                        //Array.Resize(newRelativePathEntries, newRelativePathEntries.Length + 1);
+                        //newRelativePathEntries[newRelativePathEntries.Length - 1] = "new string";
+                        
+                        string relativePathCurrentFile = str.Replace((Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\"), "");
+                        if (relativePathFromServer == relativePathCurrentFile)
+                        {
+                            DateTime modification = File.GetLastWriteTime(str);
+                            if (modification < file.CreatedDate)
+                            {
+                                await RestHelper.DownloadFile(token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + file.Name);
+                            }
+                            //downloadFile = false;
+                        }
+                        //else
+                        // {
+                        //    downloadFile = true;
+
+                        //}
+
+                    }
+
+                    //int p3 = 0;
+                    //string relativePath = filePath.Replace(observedPath, "");
+                }
+                if (!newRelativePathEntries.Contains(relativePathFromServer))
+                {
+                    await RestHelper.DownloadFile(token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + file.Name);
+                }
+               
+                //if (downloadFile == true)
+                //{
+                //var response4 = await RestHelper.DownloadFile(token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + file.Name);
+                //}
+                //else
+                //    downloadFile = true;
+            }
+                //TODO NOT WORKING PUSH SERVER FILE 
+            foreach (var entry in newRelativePathEntries)
+            {
+                if (!newRelativePathFromServer.Contains(entry))
+                {
+                    string filename = Path.GetFileName(entry);
+
+                    await RestHelper.UploadFile(entry, currentTokenUser, filename, observedPath.Text);
+                    //var response4 = await RestHelper.DownloadFile(token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + file.Name);
+                }
+            }
+        }
+
         private async void loginUser(string usernamestr, string passwordstr)
         {
             User user = new User();
@@ -227,47 +310,8 @@ namespace FileWatcherWinForms
                     buttonLogOut.Visible = true;
                     currentUser = userDTO.username;
                     currentTokenUser = userDTO.token;
-                    string[] entries = Directory.GetFileSystemEntries(observedPath.Text, "*.*", SearchOption.AllDirectories);
-                    var response2 = await RestHelper.GetUserFile(userDTO.token, userDTO.username);
-                    List<FileDTO> convert = JsonConvert.DeserializeObject<List<FileDTO>>(response2) as List<FileDTO>;
-                    Boolean downloadFile = true;
-                    foreach (FileDTO file in convert)
-                    {
-                        foreach (string str in entries)
-                        {
-                            FileAttributes att = File.GetAttributes(str);
-                            if (!((att & FileAttributes.Directory) == FileAttributes.Directory))
-                            {
-                                string relativePathFromServer = file.RelativePath.Replace((currentUser+"\\"), "");
-                                string relativePathCurrentFile = str.Replace((Properties.Settings.Default["cloudDriveObserved"].ToString()+"\\"), "");
-                                if(relativePathFromServer == relativePathCurrentFile)
-                                {
-                                    DateTime modification = File.GetLastWriteTime(str);
-                                    if(modification < file.UpdatedDate)
-                                    {
-
-                                    }
-                                    downloadFile = false;
-                                }
-                                //else
-                               // {
-                                //    downloadFile = true;
-                                    
-                                //}
-
-                            }
-
-                            //int p3 = 0;
-                            //string relativePath = filePath.Replace(observedPath, "");
-                        }
-                        if (downloadFile == true)
-                        {
-                            var response3 = await RestHelper.DownloadFile(userDTO.token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + file.Name);
-                        }
-                        else
-                            downloadFile = true;
-                    }
-                    int p = 0;
+                    checkFile(userDTO.token, userDTO.username);
+                    //int p = 0;
                 }
          
                 //var res = await RestHelper.UploadFile("E:\\PlikTestowy.txt", userDTO.token);
