@@ -82,6 +82,7 @@ export const useFileStore = defineStore({
           });
       });
     },
+
     async selectFileVersion(id) {
       await api.post("/File/selectFileVersion", null, {
         headers: {
@@ -91,6 +92,39 @@ export const useFileStore = defineStore({
           id: id,
         },
       });
+    },
+
+    async downloadTickedFiles(ticked) {
+      if (
+        authenticationStore.currentUser &&
+        authenticationStore.currentUser.token
+      ) {
+        var qs = require("qs");
+
+        await api
+          .get("/File/downloadSelectedFiles", {
+            responseType: "blob",
+            headers: {
+              Authorization: `Bearer ${authenticationStore.currentUser.token}`,
+            },
+            params: {
+              fileIds: Object.values(ticked),
+            },
+            paramsSerializer: (params) => {
+              return qs.stringify(params);
+            },
+          })
+          .then((response) => {
+            const blob = new Blob([response.data], {
+              type: response.data.type,
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "files.zip";
+            link.click();
+            URL.revokeObjectURL(link.href);
+          });
+      }
     },
   },
 });

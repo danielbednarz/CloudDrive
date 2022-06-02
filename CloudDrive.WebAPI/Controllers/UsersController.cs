@@ -74,5 +74,11 @@ namespace CloudDrive.WebAPI.Controllers
             return user == null ? NotFound("Brak użytkownika o podanej nazwie") : user;
 
         }
+        
+        [HttpGet("checkConnection")]
+        public async Task<ActionResult> CheckConnection()
+        {
+            return Ok();
+        }
     }
 }

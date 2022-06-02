@@ -16,13 +16,22 @@ export default {
     ]),
   },
   mounted() {
+    this.$q.loading.show({
+      message: "Nawiązuję połączenie z serwerem...",
+    });
     if (localStorage.user) {
       let localStorageUser = JSON.parse(localStorage.user);
       this.currentUser.username = localStorageUser.username;
       this.currentUser.token = localStorageUser.token;
 
-      let connection = connectToHub(localStorageUser.username, this.$q);
-      this.signalrConnection = connection;
+      connectToHub(localStorageUser.username, this.$q).then((response) => {
+        this.$q.loading.hide();
+        this.signalrConnection = response;
+      });
+    } else {
+      this.$api.get("/Users/checkConnection").then(() => {
+        this.$q.loading.hide();
+      });
     }
   },
 };

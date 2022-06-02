@@ -42,7 +42,8 @@ namespace CloudDrive.Application
                 RelativePath = x.RelativePath,
                 Children = (x.ChildDirectories != null ? FromUserDirectoryToDTO(x.ChildDirectories.ToList()) : null).Concat(x.Files != null ? FromUserFileToDTO(x.Files.ToList()) : null).ToList(),
                 Icon = "fa-solid fa-folder",
-                IsFile = false
+                IsFile = false,
+                NoTick = true
             }).ToList();
         }
 
@@ -54,7 +55,8 @@ namespace CloudDrive.Application
                 Name = x.Name,
                 RelativePath = x.RelativePath,
                 Icon = GetIconToFileType(x.ContentType),
-                IsFile = true
+                IsFile = true,
+                NoTick = false
             }).ToList();
 
             return userFiles;
@@ -131,7 +133,7 @@ namespace CloudDrive.Application
             string compressedDirectoryPath = directoryPath + ".zip";
 
             using FileStream zipFile = File.Open(compressedDirectoryPath, FileMode.Create);
-            
+
             await AddFilesToCompressedDirectory(id, mainPath, zipFile);
 
             string[] childDirectoriesPaths = GetChildDirectoriesPaths(directoryPath);
@@ -145,7 +147,7 @@ namespace CloudDrive.Application
             }
 
             try
-            { 
+            {
                 byte[] fileContent = File.ReadAllBytes(compressedDirectoryPath);
 
                 return new DownloadDirectoryDTO { Bytes = fileContent, DirectoryName = directory.Name + ".zip" };
@@ -169,7 +171,7 @@ namespace CloudDrive.Application
                 archive.CreateEntryFromFile(absolutePathToFileWithId, file.Name);
             }
 
-            archive.Dispose(); 
+            archive.Dispose();
         }
 
         private async Task AddFilesToParentCompressedDirectory(UserDirectory directory, string mainPath, string compressedDirectoryPath)
@@ -208,7 +210,7 @@ namespace CloudDrive.Application
             await AddSelectedFilesToDirectory(zipFile, fileIds, mainPath);
 
             try
-            { 
+            {
                 byte[] fileContent = File.ReadAllBytes(compressedDirectoryPath);
 
                 return new DownloadDirectoryDTO { Bytes = fileContent, DirectoryName = "Selected_files.zip" };
@@ -229,7 +231,7 @@ namespace CloudDrive.Application
 
                 var absolutePathToFileWithFileName = Path.Combine(mainPath, file.RelativePath);
                 var absolutePathToFileWithId = absolutePathToFileWithFileName.Replace(file.Name, file.Id.ToString());   //nazwa pliku z Guid -> FileName
-                
+
                 archive.CreateEntryFromFile(absolutePathToFileWithId, file.Name);
             }
 

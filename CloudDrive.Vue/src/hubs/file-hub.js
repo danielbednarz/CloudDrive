@@ -1,6 +1,6 @@
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
-const connectToHub = (username, q) => {
+const connectToHub = async (username, q) => {
   const connection = new HubConnectionBuilder()
     .withUrl(`https://localhost:44390/file-hub?username=${username}`)
     .configureLogging(LogLevel.Information)
@@ -13,7 +13,7 @@ const connectToHub = (username, q) => {
     });
   });
 
-  connection.start();
+  await connection.start();
 
   return connection;
 };

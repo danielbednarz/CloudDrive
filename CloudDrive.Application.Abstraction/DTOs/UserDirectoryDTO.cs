@@ -9,6 +9,7 @@ namespace CloudDrive.Application
         public string Icon { get; set; }
         public string RelativePath { get; set; }
         public bool IsFile { get; set; }
+        public bool NoTick { get; set; }
         public List<UserDirectoryDTO> Children { get; set; }
     }
 }
