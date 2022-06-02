@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -116,8 +117,35 @@ namespace FileWatcherWinForms
                        
                         if (data != null)
                         {
-                            var files = new List<FileDTO>();
+                            //var files = new List<FileDTO>();
                             return data;
+                        }
+                    }
+                }
+            }
+            return string.Empty;
+        }
+
+        public static async Task<string> DownloadFile(string token, Guid idFile, string fileName)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                using (var res = await client.GetAsync(baseURL + "File/downloadFile?fileId=" +idFile))
+                {
+                    using (HttpContent content = res.Content)
+                    {
+                        var data = await content.ReadAsStreamAsync();
+
+                        if (data != null)
+                        {
+                            var fileInfo = new FileInfo(fileName);
+                            using (var fileStream = fileInfo.OpenWrite())
+                            {
+                                await data.CopyToAsync(fileStream);
+                            }
+                            return res.StatusCode.ToString();
+                            //return File(data, content.GetType, content.Headers);
                         }
                     }
                 }

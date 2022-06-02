@@ -230,6 +230,7 @@ namespace FileWatcherWinForms
                     string[] entries = Directory.GetFileSystemEntries(observedPath.Text, "*.*", SearchOption.AllDirectories);
                     var response2 = await RestHelper.GetUserFile(userDTO.token, userDTO.username);
                     List<FileDTO> convert = JsonConvert.DeserializeObject<List<FileDTO>>(response2) as List<FileDTO>;
+                    Boolean downloadFile = true;
                     foreach (FileDTO file in convert)
                     {
                         foreach (string str in entries)
@@ -246,11 +247,25 @@ namespace FileWatcherWinForms
                                     {
 
                                     }
+                                    downloadFile = false;
                                 }
+                                //else
+                               // {
+                                //    downloadFile = true;
+                                    
+                                //}
 
                             }
-                                //string relativePath = filePath.Replace(observedPath, "");
+
+                            //int p3 = 0;
+                            //string relativePath = filePath.Replace(observedPath, "");
                         }
+                        if (downloadFile == true)
+                        {
+                            var response3 = await RestHelper.DownloadFile(userDTO.token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + file.Name);
+                        }
+                        else
+                            downloadFile = true;
                     }
                     int p = 0;
                 }
