@@ -49,5 +49,20 @@ namespace CloudDrive.Data.Repositories
                ParentDirectoryId = x.ParentDirectoryId
            }).ToListAsync();
         }
+
+        public async Task<UserDirectory> GetDirectoryById(Guid id)
+        {
+            return await _context.UserDirectories.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<UserDirectory> GetDirectoryByRelativePath(string relativePath, string username)
+        {
+            return await _context.UserDirectories.FirstOrDefaultAsync(x => x.User.Username == username && x.RelativePath == relativePath);
+        }
+
+        public async Task<List<UserFile>> GetFilesFromDirectory(Guid directoryId)
+        {
+            return await _context.Files.Where(x => x.DirectoryId == directoryId).ToListAsync();
+        }
     }
 }

@@ -12,6 +12,7 @@ export const useAuthenticationStore = defineStore({
       username: "",
       token: "",
     },
+    signalrConnection: null,
   }),
   actions: {
     async login() {
@@ -31,7 +32,9 @@ export const useAuthenticationStore = defineStore({
     logout() {
       this.currentUser.username = "";
       this.currentUser.token = "";
+      this.signalrConnection.stop();
       localStorage.removeItem("user");
+      this.signalrConnection = null;
     },
     clearForm() {
       this.form.Username = "";

@@ -12,5 +12,6 @@ namespace CloudDrive.Data.Abstraction
         Task<UserFile> MarkFileAsDeleted(string filePath, int? userId, string username);
         Task MarkFileAsCurrentById(Guid fileId, int? userId, string currentRelativePath, Guid? currentDirectoryId);
         Task<List<UserFile>> GetUserDriveFilesToTreeView(Guid mainDirectoryId);
+        string GetMimeType(string fileName);
     }
 }

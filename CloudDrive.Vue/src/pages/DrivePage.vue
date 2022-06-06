@@ -13,12 +13,12 @@
               :label="getButtonLabel()"
               icon="fa-solid fa-folder-plus"
               color="secondary"
-              :outline="isAddFolderMenuOpen"
+              :outline="isAddDirectoryMenuOpen"
               :text-color="getTextColor()"
               type="submit"
               @click="
                 () => {
-                  isAddFolderMenuOpen = !isAddFolderMenuOpen;
+                  isAddDirectoryMenuOpen = !isAddDirectoryMenuOpen;
                 }
               "
             />
@@ -30,17 +30,13 @@
           leave-active-class="animated fadeOut"
         >
           <directory-add-form
-            v-if="isAddFolderMenuOpen"
-            @close="
-              () => {
-                isAddFolderMenuOpen = false;
-              }
-            "
+            v-if="isAddDirectoryMenuOpen"
+            @close="onDirectoryAddFormClose"
             class="q-mt-md"
           />
         </transition>
         <div class="q-mt-md">
-          <files-grid />
+          <files-grid ref="filesGrid" />
         </div>
       </main-container>
     </q-page>
@@ -56,7 +52,7 @@ export default {
   name: "DrivePage",
   data() {
     return {
-      isAddFolderMenuOpen: false,
+      isAddDirectoryMenuOpen: false,
     };
   },
   components: {
@@ -66,10 +62,14 @@ export default {
   },
   methods: {
     getButtonLabel() {
-      return this.isAddFolderMenuOpen ? "Zamknij" : "Nowy folder";
+      return this.isAddDirectoryMenuOpen ? "Zamknij" : "Nowy folder";
     },
     getTextColor() {
-      return this.isAddFolderMenuOpen ? "secondary" : "black";
+      return this.isAddDirectoryMenuOpen ? "secondary" : "black";
+    },
+    onDirectoryAddFormClose() {
+      this.isAddDirectoryMenuOpen = false;
+      this.$refs["filesGrid"].loadUserDriveData();
     },
   },
 };

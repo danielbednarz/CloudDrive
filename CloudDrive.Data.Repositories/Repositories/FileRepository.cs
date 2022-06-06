@@ -62,7 +62,7 @@ namespace CloudDrive.Data.Repositories
             return userFile;
         }
 
-        private static string GetMimeType(string fileName)
+        public string GetMimeType(string fileName)
         {
             string mimeType = "application/unknown";
             string ext = Path.GetExtension(fileName).ToLower();

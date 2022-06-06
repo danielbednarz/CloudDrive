@@ -4,7 +4,6 @@ using CloudDrive.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using System.Reflection.Metadata;
 using System.Security.Claims;
 
 namespace CloudDrive.WebAPI
@@ -21,6 +20,8 @@ namespace CloudDrive.WebAPI
             _directoryService = directoryService;
             _hubContext = hubContext;
         }
+
+        #region Files
 
         [Authorize]
         [HttpGet("getUserFiles")]
@@ -130,7 +131,55 @@ namespace CloudDrive.WebAPI
 
             return Ok();
         }
-        
+
+        [Authorize]
+        [HttpGet("getFileVersions")]
+        public async Task<IActionResult> GetFileVersions(Guid fileId)
+        {
+            List<FileVersionDTO> fileVersions = await _fileService.GetFileVersions(fileId);
+            return Ok(fileVersions);
+        }
+
+        [Authorize]
+        [HttpPost("selectFileVersion")]
+        public async Task<IActionResult> SelectFileVersion(Guid id)
+        {
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            await _fileService.SelectFileVersion(id, loggedUsername);
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpGet("downloadFile")]
+        public async Task<IActionResult> DownloadFile(Guid fileId)
+        {
+            var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (loggedUsername == null)
+            {
+                return NotFound("Błąd przy próbie znalezienia użytkownika");
+            }
+
+            DownloadFileDTO downloadedFile = await _fileService.DownloadFile(fileId, loggedUsername);
+
+            if (downloadedFile == null)
+            {
+                return NotFound("Brak pliku do pobrania");
+            }
+
+            return File(downloadedFile.Bytes, downloadedFile.UserFile.ContentType, downloadedFile.UserFile.Name);
+        }
+
+        #endregion Files
+
+        #region Directories
+
         [Authorize]
         [HttpPost("addDirectory")]
         public async Task<IActionResult> AddDirectory(AddDirectoryVM model)
@@ -164,8 +213,8 @@ namespace CloudDrive.WebAPI
         }
 
         [Authorize]
-        [HttpGet("downloadFile")]
-        public async Task<IActionResult> DownloadFile(Guid fileId)
+        [HttpGet("downloadSelectedFiles")]
+        public async Task<IActionResult> DownloadSelectedFiles([FromQuery]List<Guid> fileIds)
         {
             var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -174,27 +223,14 @@ namespace CloudDrive.WebAPI
                 return NotFound("Błąd przy próbie znalezienia użytkownika");
             }
 
-            DownloadFileDTO downloadedFile = await _fileService.DownloadFile(fileId, loggedUsername);
+            DownloadDirectoryDTO downloadDirectoryDTO = await _directoryService.CreateSelectedFilesDirectory(fileIds, loggedUsername);
 
-            if (downloadedFile == null)
-            {
-                return NotFound("Brak pliku do pobrania");
-            }
-
-            return File(downloadedFile.Bytes, downloadedFile.UserFile.ContentType, downloadedFile.UserFile.Name);
+            return File(downloadDirectoryDTO.Bytes, "application/zip", downloadDirectoryDTO.DirectoryName);
         }
 
         [Authorize]
-        [HttpGet("getFileVersions")]
-        public async Task<IActionResult> GetFileVersions(Guid fileId)
-        {
-            List<FileVersionDTO> fileVersions = await _fileService.GetFileVersions(fileId);
-            return Ok(fileVersions);
-        }
-
-        [Authorize]
-        [HttpPost("selectFileVersion")]
-        public async Task<IActionResult> SelectFileVersion(Guid id)
+        [HttpGet("downloadDirectory")]
+        public async Task<IActionResult> DownloadDirectory(Guid directoryId)
         {
             var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -203,8 +239,16 @@ namespace CloudDrive.WebAPI
                 return NotFound("Błąd przy próbie znalezienia użytkownika");
             }
 
-            await _fileService.SelectFileVersion(id, loggedUsername);
-            return Ok();
+            DownloadDirectoryDTO downloadDirectoryDTO = await _directoryService.CreateCompressedDirectory(directoryId, loggedUsername);
+
+            if (downloadDirectoryDTO == null)
+            {
+                return NotFound("Błąd przy próbie pobrania folderu");
+            }
+
+            return File(downloadDirectoryDTO.Bytes, "application/zip", downloadDirectoryDTO.DirectoryName);
         }
+
+        #endregion Directories
     }
 }

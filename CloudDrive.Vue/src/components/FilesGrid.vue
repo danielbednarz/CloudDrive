@@ -1,6 +1,21 @@
 <template>
   <div class="section-container">
-    <p class="text-h5 q-mt-lg q-mb-xs">Pliki</p>
+    <div class="row justify-start q-mt-lg q-mx-lg">
+      <div class="col-3">
+        <q-btn
+          label="Pobierz zaznaczone pliki"
+          icon="fa-solid fa-list-check"
+          color="primary"
+          text-color="white"
+          type="submit"
+          :disabled="ticked.length === 0"
+          @click="tryDownloadTickedFiles"
+        />
+      </div>
+      <div class="col-6">
+        <p class="text-h5 q-mt-lg q-mb-xs">Pliki</p>
+      </div>
+    </div>
     <div class="q-pa-md text-white">
       <q-splitter v-model="splitterModel">
         <template v-slot:before>
@@ -10,10 +25,12 @@
             color="secondary"
             label-key="name"
             dark
+            v-model:ticked="ticked"
             v-model:selected="selected"
             ref="directoriesTree"
             no-nodes-label="Dysk jest pusty"
             no-results-label="Dysk jest pusty"
+            tick-strategy="strict"
           />
         </template>
         <template v-slot:after>
@@ -59,6 +76,21 @@
                 />
               </div>
             </div>
+            <div
+              class="row justify-center q-my-xl"
+              v-if="!getSelectedObject.isFile"
+            >
+              <div class="column">
+                <q-btn
+                  icon="fa-solid fa-file-zipper"
+                  color="secondary"
+                  text-color="black"
+                  label="Pobierz"
+                  class="q-mx-sm"
+                  @click="tryDownloadDirectory()"
+                />
+              </div>
+            </div>
             <file-versions-dialog
               :isVersionsDialogVisible="isVersionsDialogVisible"
               :fileId="getSelectedObject.id"
@@ -85,6 +117,7 @@ export default {
     return {
       userDirectories: [],
       selected: null,
+      ticked: [],
       splitterModel: 50,
       isVersionsDialogVisible: false,
     };
@@ -103,8 +136,14 @@ export default {
     ...mapActions(useDirectoryStore, [
       "getDirectoriesToSelectList",
       "getUserDriveDataToTreeView",
+      "downloadDirectory",
     ]),
-    ...mapActions(useFileStore, ["getUserFiles", "deleteFile", "downloadFile"]),
+    ...mapActions(useFileStore, [
+      "getUserFiles",
+      "deleteFile",
+      "downloadFile",
+      "downloadTickedFiles",
+    ]),
     async tryDelete() {
       await this.deleteFile(this.getSelectedObject.relativePath);
       this.getUserDriveDataToTreeView().then((response) => {
@@ -122,6 +161,12 @@ export default {
         name: this.getSelectedObject.name,
       });
     },
+    async tryDownloadDirectory() {
+      await this.downloadDirectory({
+        id: this.getSelectedObject.id,
+        name: this.getSelectedObject.name,
+      });
+    },
     onDialogHideSelected() {
       this.isVersionsDialogVisible = false;
       this.selected = null;
@@ -133,14 +178,20 @@ export default {
         this.userDirectories = response;
       });
     },
+    loadUserDriveData() {
+      this.getUserDriveDataToTreeView().then((response) => {
+        this.userDirectories = response;
+      });
+    },
+    async tryDownloadTickedFiles() {
+      await this.downloadTickedFiles(this.ticked);
+    },
   },
   mounted() {
     // this.getUserFiles().then((response) => {
     //   this.files = response;
     // });
-    this.getUserDriveDataToTreeView().then((response) => {
-      this.userDirectories = response;
-    });
+    this.loadUserDriveData();
   },
   components: {
     FileVersionsDialog,
