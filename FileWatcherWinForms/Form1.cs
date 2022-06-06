@@ -209,9 +209,10 @@ namespace FileWatcherWinForms
                 newRelativePathFromServer.Add(relativePathFromServer);
             }
 
-                foreach (FileDTO file in convert)
+            foreach (FileDTO file in convert)
             {
                 string relativePathFromServer = file.RelativePath.Replace((currentUser + "\\"), "");
+
                 foreach (string str in entries)
                 {
                     FileAttributes att = File.GetAttributes(str);
@@ -227,7 +228,9 @@ namespace FileWatcherWinForms
                             DateTime modification = File.GetLastWriteTime(str);
                             if (modification < file.UpdatedDate)
                             {
+                                fileSystemWatcher1.EnableRaisingEvents = false;
                                 await RestHelper.DownloadFile(token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + file.Name);
+                                fileSystemWatcher1.EnableRaisingEvents = true;
                             }
                             //downloadFile = false;
                         }
@@ -244,7 +247,9 @@ namespace FileWatcherWinForms
                 }
                 if (!newRelativePathEntries.Contains(relativePathFromServer))
                 {
+                    fileSystemWatcher1.EnableRaisingEvents = false;
                     await RestHelper.DownloadFile(token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + relativePathFromServer);
+                    fileSystemWatcher1.EnableRaisingEvents = true;
                 }
                
                 //if (downloadFile == true)
@@ -254,17 +259,17 @@ namespace FileWatcherWinForms
                 //else
                 //    downloadFile = true;
             }
-                //TODO NOT WORKING PUSH SERVER FILE 
-            //foreach (var entry in newRelativePathEntries)
-            //{
-            //    if (!newRelativePathFromServer.Contains(entry))
-            //    {
-            //        string filename = Path.GetFileName(entry);
+            //TODO NOT WORKING PUSH SERVER FILE 
+            foreach (var entry in newRelativePathEntries)
+            {
+                if (!newRelativePathFromServer.Contains(entry))
+                {
+                    string filename = Path.GetFileName(entry);
 
-            //        await RestHelper.UploadFile(entry, currentTokenUser, filename, observedPath.Text);
-            //        //var response4 = await RestHelper.DownloadFile(token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + file.Name);
-            //    }
-            //}
+                    await RestHelper.UploadFile(Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\" + entry, currentTokenUser, filename, observedPath.Text);
+                    //var response4 = await RestHelper.DownloadFile(token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + file.Name);
+                }
+            }
         }
 
         private async void loginUser(string usernamestr, string passwordstr)
