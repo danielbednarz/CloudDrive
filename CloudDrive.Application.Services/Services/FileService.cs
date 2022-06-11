@@ -125,7 +125,7 @@ namespace CloudDrive.Application
         public async Task<DownloadFileDTO> DownloadFile(Guid fileId, string username)
         {
             var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();
-            var file = await _fileRepository.GetFileById(fileId);
+            var file = await _fileRepository.GetFileByIdAsync(fileId);
             var fileDirectory = await _directoryRepository.FirstOrDefaultAsync(x => x.User.Username == username && x.Id == file.DirectoryId);
 
             if (file == null)
@@ -142,7 +142,7 @@ namespace CloudDrive.Application
 
         public async Task<List<FileVersionDTO>> GetFileVersions(Guid fileId)
         {
-            UserFile file = await _fileRepository.GetFileById(fileId);
+            UserFile file = await _fileRepository.GetFileByIdAsync(fileId);
             List<UserFile> allVersions = await _fileRepository.GetAllFileVersions(file);
 
             return allVersions.Select(x => new FileVersionDTO()

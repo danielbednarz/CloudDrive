@@ -7,7 +7,8 @@ namespace CloudDrive.Data.Abstraction
     {
         Task<List<FileDataDTO>> GetUserFiles(int userId);
         Task<UserFile> AddFile(AddUserFileVM file, UserDirectory userDirectory);
-        Task<UserFile> GetFileById(Guid fileId);
+        Task<UserFile> GetFileByIdAsync(Guid fileId);
+        UserFile GetFileById(Guid fileId);
         Task<List<UserFile>> GetAllFileVersions(UserFile file);
         Task<UserFile> MarkFileAsDeleted(string filePath, int? userId, string username);
         Task MarkFileAsCurrentById(Guid fileId, int? userId, string currentRelativePath, Guid? currentDirectoryId);

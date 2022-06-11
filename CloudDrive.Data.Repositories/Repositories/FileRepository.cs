@@ -77,9 +77,14 @@ namespace CloudDrive.Data.Repositories
             return mimeType;
         }
 
-        public async Task<UserFile> GetFileById(Guid fileId)
+        public async Task<UserFile> GetFileByIdAsync(Guid fileId)
         {
             return await _context.Files.FirstOrDefaultAsync(x => x.Id == fileId);
+        }
+
+        public UserFile GetFileById(Guid fileId)
+        {
+            return _context.Files.FirstOrDefault(x => x.Id == fileId);
         }
 
         public async Task<List<UserFile>> GetAllFileVersions(UserFile file)

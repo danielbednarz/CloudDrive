@@ -123,7 +123,7 @@ namespace CloudDrive.Application
             return await _directoryRepository.GetDirectoriesToSelectList(user.Id, username);
         }
 
-        public async Task<DownloadDirectoryDTO> CreateCompressedDirectory(Guid id, string username)
+        public async Task<DownloadDirectoryDTO> CreateCompressedDirectory(Guid id)
         {
             string mainPath = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>().SaveFilePath;
 
@@ -132,19 +132,13 @@ namespace CloudDrive.Application
             string directoryPath = Path.Combine(mainPath, directory.RelativePath);
             string compressedDirectoryPath = directoryPath + ".zip";
 
-            using FileStream zipFile = File.Open(compressedDirectoryPath, FileMode.Create);
-
-            await AddFilesToCompressedDirectory(id, mainPath, zipFile);
-
-            string[] childDirectoriesPaths = GetChildDirectoriesPaths(directoryPath);
-            foreach (var childDirectoryPath in childDirectoriesPaths)
+            if (File.Exists(compressedDirectoryPath))   // usunięcie zipa jeśli już istnieje o identycznej nazwie
             {
-                string relativeChildDirectoryPath = childDirectoryPath.Substring(mainPath.Length + 1);  // stworzenie ścieżki względnej
-
-                UserDirectory subDirectory = await _directoryRepository.GetDirectoryByRelativePath(relativeChildDirectoryPath, username);
-
-                await AddFilesToParentCompressedDirectory(subDirectory, mainPath, compressedDirectoryPath);
+                File.Delete(compressedDirectoryPath);
             }
+
+            ZipFile.CreateFromDirectory(directoryPath, compressedDirectoryPath);
+            await RenameZipFiles(compressedDirectoryPath, directory.RelativePath);
 
             try
             {
@@ -155,6 +149,31 @@ namespace CloudDrive.Application
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        private async Task RenameZipFiles(string zipDirectory, string directoryRelativePath)
+        {
+            using var archive = new ZipArchive(File.Open(zipDirectory, FileMode.Open, FileAccess.ReadWrite), ZipArchiveMode.Update);
+
+            var files = archive.Entries.ToArray();
+            foreach (var entry in files)
+            {
+                var fileId = Guid.Parse(entry.Name);
+
+                UserFile file = await _fileRepository.GetFileByIdAsync(fileId);
+
+                var fileNameWithSubdirectory = file.RelativePath.Replace(directoryRelativePath + "\\", "");
+
+                var newZipFileEntry = archive.CreateEntry(fileNameWithSubdirectory);
+                using (var zipFile = entry.Open())
+                {
+                    using var newZipFile = newZipFileEntry.Open();
+                    zipFile.CopyTo(newZipFile);
+
+                }
+
+                entry.Delete();
             }
         }
 
@@ -227,7 +246,7 @@ namespace CloudDrive.Application
 
             foreach (var fileId in fileIds)
             {
-                UserFile file = await _fileRepository.GetFileById(fileId);
+                UserFile file = await _fileRepository.GetFileByIdAsync(fileId);
 
                 var absolutePathToFileWithFileName = Path.Combine(mainPath, file.RelativePath);
                 var absolutePathToFileWithId = absolutePathToFileWithFileName.Replace(file.Name, file.Id.ToString());   //nazwa pliku z Guid -> FileName
