@@ -177,44 +177,6 @@ namespace CloudDrive.Application
             }
         }
 
-        private async Task AddFilesToCompressedDirectory(Guid directoryId, string mainPath, FileStream zipFile)
-        {
-            using var archive = new ZipArchive(zipFile, ZipArchiveMode.Create);
-
-            var filesFromDirectory = await _directoryRepository.GetFilesFromDirectory(directoryId);
-            foreach (var file in filesFromDirectory)
-            {
-                var absolutePathToFileWithFileName = Path.Combine(mainPath, file.RelativePath);
-                var absolutePathToFileWithId = absolutePathToFileWithFileName.Replace(file.Name, file.Id.ToString());   //nazwa pliku z Guid -> FileName
-
-                archive.CreateEntryFromFile(absolutePathToFileWithId, file.Name);
-            }
-
-            archive.Dispose();
-        }
-
-        private async Task AddFilesToParentCompressedDirectory(UserDirectory directory, string mainPath, string compressedDirectoryPath)
-        {
-            using FileStream zipFile = File.Open(compressedDirectoryPath, FileMode.OpenOrCreate);
-            using var archive = new ZipArchive(zipFile, ZipArchiveMode.Update);
-
-            var filesFromDirectory = await _directoryRepository.GetFilesFromDirectory(directory.Id);
-            foreach (var file in filesFromDirectory)
-            {
-                var absolutePathToFileWithFileName = Path.Combine(mainPath, file.RelativePath);
-                var absolutePathToFileWithId = absolutePathToFileWithFileName.Replace(file.Name, file.Id.ToString());   //nazwa pliku z Guid -> FileName
-
-                archive.CreateEntryFromFile(absolutePathToFileWithId, file.Name);
-            }
-
-            archive.Dispose();
-        }
-
-        private static string[] GetChildDirectoriesPaths(string directoryPath)
-        {
-            return Directory.GetDirectories(directoryPath, "*", SearchOption.AllDirectories);
-        }
-
         public async Task<DownloadDirectoryDTO> CreateSelectedFilesDirectory(List<Guid> fileIds, string username)
         {
             string mainPath = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>().SaveFilePath;
