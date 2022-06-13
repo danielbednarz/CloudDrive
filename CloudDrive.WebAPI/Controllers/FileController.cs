@@ -239,7 +239,7 @@ namespace CloudDrive.WebAPI
                 return NotFound("Błąd przy próbie znalezienia użytkownika");
             }
 
-            DownloadDirectoryDTO downloadDirectoryDTO = await _directoryService.CreateCompressedDirectory(directoryId, loggedUsername);
+            DownloadDirectoryDTO downloadDirectoryDTO = await _directoryService.CreateCompressedDirectory(directoryId);
 
             if (downloadDirectoryDTO == null)
             {
