@@ -117,7 +117,6 @@ namespace FileWatcherWinForms
                        
                         if (data != null)
                         {
-                            //var files = new List<FileDTO>();
                             return data;
                         }
                     }
@@ -150,7 +149,6 @@ namespace FileWatcherWinForms
                                 await data.CopyToAsync(fileStream);
                             }
                             return res.StatusCode.ToString();
-                            //return File(data, content.GetType, content.Headers);
                         }
                     }
                 }

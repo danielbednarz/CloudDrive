@@ -11,7 +11,8 @@ using Microsoft.Win32;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
-
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 
 namespace FileWatcherWinForms
 {
@@ -20,13 +21,23 @@ namespace FileWatcherWinForms
     {
         string currentUser;
         string currentTokenUser;
+        HubConnection connection;
 
         public CloudDrive()
         {
             InitializeComponent();
             AutoRunOnWindowsStartup();
             WindowAppearance();
-            //username.Text = Properties.Settings.Default["usernameForm"].ToString();
+
+            connection = new HubConnectionBuilder()
+                .WithUrl("https://localhost:44390/file-hub?username=" + Properties.Settings.Default["usernameForm"].ToString())
+                .Build();
+
+            connection.Closed += async (error) =>
+            {
+                await Task.Delay(new Random().Next(0, 5) * 1000);
+                await connection.StartAsync();
+            };
         }
 
 
@@ -75,9 +86,6 @@ namespace FileWatcherWinForms
             {
                 return;
             }
-            //string filename = Path.GetFileName(e.FullPath);
-            //RestHelper.DeleteFile(e.FullPath, observedPath.Text, currentTokenUser, currentUser);
-            //await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename, observedPath.Text);
             SaveLog($"Changed: {e.FullPath}");
 
         }
@@ -102,9 +110,6 @@ namespace FileWatcherWinForms
 
         private async void fileSystemWatcher1_Renamed(object sender, RenamedEventArgs e)
         {
-            //string filename = Path.GetFileName(e.FullPath);
-            //RestHelper.DeleteFile(e.FullPath, observedPath.Text, currentTokenUser, currentUser);
-            //await RestHelper.UploadFile(e.FullPath, currentTokenUser, filename, observedPath.Text);
             SaveLog($"Renamed:");
             SaveLog($"    Old: {e.OldFullPath}");
             SaveLog($"    New: {e.FullPath}");
@@ -157,9 +162,21 @@ namespace FileWatcherWinForms
             reg.SetValue("Cloud Drive", Application.ExecutablePath.ToString());
         }
 
-        private void CloudDrive_Load(object sender, EventArgs e)
+        private async void CloudDrive_Load(object sender, EventArgs e)
         {
+            connection.On<string, string>("FileAdded", (username, fileName) =>
+            {
+                checkFile(currentTokenUser, currentUser);
+            });
 
+            try
+            {
+                await connection.StartAsync();
+            }
+            catch (Exception ex)
+            {
+                SaveLog($"ERROR: {ex}");
+            }
         }
 
         private void WindowAppearance()
@@ -172,7 +189,6 @@ namespace FileWatcherWinForms
             password.PasswordChar = '*';
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             username.Select();
-            //this.StartPosition = FormStartPosition.CenterParent;
             if (Convert.ToBoolean(Properties.Settings.Default["rememberMe"]) == true)
             {
                 checkBoxRemember.Checked = true;
@@ -187,7 +203,6 @@ namespace FileWatcherWinForms
         private async void checkFile(string token, string username)
         {
             string[] entries = Directory.GetFileSystemEntries(observedPath.Text, "*.*", SearchOption.AllDirectories);
-            //string[] newRelativePathEntries = ne;
             List<String> newRelativePathEntries = new List<String>();
             List<String> newRelativePathFromServer = new List<String>();
             var response2 = await RestHelper.GetUserFile(token, username);
@@ -218,10 +233,6 @@ namespace FileWatcherWinForms
                     FileAttributes att = File.GetAttributes(str);
                     if (!((att & FileAttributes.Directory) == FileAttributes.Directory))
                     {
-                        
-                        //Array.Resize(newRelativePathEntries, newRelativePathEntries.Length + 1);
-                        //newRelativePathEntries[newRelativePathEntries.Length - 1] = "new string";
-                        
                         string relativePathCurrentFile = str.Replace((Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\"), "");
                         if (relativePathFromServer == relativePathCurrentFile)
                         {
@@ -232,18 +243,8 @@ namespace FileWatcherWinForms
                                 await RestHelper.DownloadFile(token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + file.Name);
                                 fileSystemWatcher1.EnableRaisingEvents = true;
                             }
-                            //downloadFile = false;
                         }
-                        //else
-                        // {
-                        //    downloadFile = true;
-
-                        //}
-
                     }
-
-                    //int p3 = 0;
-                    //string relativePath = filePath.Replace(observedPath, "");
                 }
                 if (!newRelativePathEntries.Contains(relativePathFromServer))
                 {
@@ -251,23 +252,13 @@ namespace FileWatcherWinForms
                     await RestHelper.DownloadFile(token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + relativePathFromServer);
                     fileSystemWatcher1.EnableRaisingEvents = true;
                 }
-               
-                //if (downloadFile == true)
-                //{
-                //var response4 = await RestHelper.DownloadFile(token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + file.Name);
-                //}
-                //else
-                //    downloadFile = true;
             }
-            //TODO NOT WORKING PUSH SERVER FILE 
             foreach (var entry in newRelativePathEntries)
             {
                 if (!newRelativePathFromServer.Contains(entry))
                 {
                     string filename = Path.GetFileName(entry);
-
                     await RestHelper.UploadFile(Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\" + entry, currentTokenUser, filename, observedPath.Text);
-                    //var response4 = await RestHelper.DownloadFile(token, file.Id, (Properties.Settings.Default["cloudDriveObserved"].ToString() + "\\") + file.Name);
                 }
             }
         }
@@ -279,14 +270,10 @@ namespace FileWatcherWinForms
             user.username = usernamestr;
             user.password = passwordstr;
             var response = await RestHelper.Login(user);
-
-            //Debug.WriteLine(response);
-            //Debug.WriteLine(Properties.Settings.Default["usernameForm"].ToString());
             if (!response.Contains("Nieprawid³owa nazwa u¿ytkownika"))
             {
                 userDTO = System.Text.Json.JsonSerializer.Deserialize<UserDTO>(response);
             }
-            //Debug.WriteLine(userDTO.token);
             if (userDTO != null && userDTO.token != null && userDTO.username != null)
             {
                 nameApp.Visible = false;
@@ -308,20 +295,11 @@ namespace FileWatcherWinForms
                 else
                 {
                     fileSystemWatcher1.EnableRaisingEvents = true;
-                    // System.IO.DriveInfo di = new System.IO.DriveInfo(observedPath.Text);
-                    //System.IO.DirectoryInfo dirInfo = new System.IO.DirectoryInfo(observedPath.Text);
-                    //System.IO.FileInfo[] fileNames = dirInfo.GetFiles();
-                    //System.IO.DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
                     buttonLogOut.Visible = true;
                     currentUser = userDTO.username;
                     currentTokenUser = userDTO.token;
                     checkFile(userDTO.token, userDTO.username);
-                    //int p = 0;
                 }
-         
-                //var res = await RestHelper.UploadFile("E:\\PlikTestowy.txt", userDTO.token);
-                //Debug.WriteLine("Witaj");
-                //Debug.WriteLine(res);
             }
             else MessageBox.Show(this, "B³êdna nazwa u¿ytkownika, lub has³o.");
 
@@ -331,7 +309,6 @@ namespace FileWatcherWinForms
                 Properties.Settings.Default["usernameForm"] = currentUser;
                 Properties.Settings.Default["passwordForm"] = password.Text;
                 Properties.Settings.Default["usernameForm"] = currentUser;
-                //Properties.Settings.Default["tokenForm"] = currentUser;
                 Properties.Settings.Default.Save();
             }
             else
@@ -340,11 +317,8 @@ namespace FileWatcherWinForms
                 Properties.Settings.Default["usernameForm"] = "";
                 Properties.Settings.Default["passwordForm"] = "";
                 Properties.Settings.Default["usernameForm"] = "";
-                //Properties.Settings.Default["tokenForm"] = "";
                 Properties.Settings.Default.Save();
             }
-            
-            //System.IO.FileInfo[] fileNames = dirInfo.GetFiles("*.*");
         }
 
 
