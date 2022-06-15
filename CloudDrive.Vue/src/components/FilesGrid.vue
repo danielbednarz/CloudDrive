@@ -169,10 +169,12 @@ export default {
       });
     },
     async tryDownload() {
+      this.isLoading = true;
       await this.downloadFile({
         id: this.getSelectedObject.id,
         name: this.getSelectedObject.name,
       });
+      this.isLoading = false;
     },
     async tryDownloadDirectory() {
       await this.downloadDirectory({
