@@ -20,7 +20,7 @@
     </div>
     <div class="row">
       <q-uploader
-        url="https://localhost:44390/api/File/uploadFile"
+        url="https://192.168.55.107:8009/api/File/uploadFile"
         color="secondary"
         text-color="dark"
         square
