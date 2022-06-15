@@ -41,7 +41,7 @@ export const useDirectoryStore = defineStore({
         });
       }
     },
-    getUserDriveDataToTreeView() {
+    getUserDriveDataToTreeView(showDeleted) {
       if (
         authenticationStore.currentUser &&
         authenticationStore.currentUser.token
@@ -51,6 +51,9 @@ export const useDirectoryStore = defineStore({
             .get("/File/getUserDriveDataToTreeView", {
               headers: {
                 Authorization: `Bearer ${authenticationStore.currentUser.token}`,
+              },
+              params: {
+                showDeleted: showDeleted,
               },
             })
             .then((response) => {

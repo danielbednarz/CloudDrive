@@ -21,6 +21,14 @@ namespace CloudDrive.Data.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<UserDirectory>> GetUserDriveDeletedDataToTreeView(string username, Guid mainDirectoryId)
+        {
+            return await _context.UserDirectories
+                .OrderBy(x => x.CreatedDate)
+                .Where(x => x.ParentDirectoryId == mainDirectoryId && x.RelativePath == $"{username}\\archive")
+                .ToListAsync();
+        }
+
         public async Task AddDirectory(AddDirectoryVM model)
         {
             await _context.UserDirectories.AddAsync(new UserDirectory

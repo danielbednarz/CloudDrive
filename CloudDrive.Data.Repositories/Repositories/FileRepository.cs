@@ -128,5 +128,13 @@ namespace CloudDrive.Data.Repositories
                 .Where(x => x.DirectoryId == mainDirectoryId && !x.IsDeleted)
                 .ToListAsync();
         }
+
+        public async Task<List<UserFile>> GetUserDriveDeletedFilesToTreeView(Guid archiveDirectoryId)
+        {
+            return await _context.Files
+                .OrderBy(x => x.CreatedDate)
+                .Where(x => x.DirectoryId == archiveDirectoryId && x.IsDeleted)
+                .ToListAsync();
+        }
     }
 }

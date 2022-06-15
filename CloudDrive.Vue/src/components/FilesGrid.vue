@@ -1,6 +1,6 @@
 <template>
   <div class="section-container">
-    <div class="row justify-start q-mt-lg q-mx-lg">
+    <div class="row q-mt-lg q-mx-md">
       <div class="col-3">
         <q-btn
           label="Pobierz zaznaczone pliki"
@@ -10,6 +10,16 @@
           type="submit"
           :disabled="ticked.length === 0"
           @click="tryDownloadTickedFiles"
+        />
+      </div>
+    </div>
+    <div class="row q-mt-sm q-mx-md">
+      <div class="col-3">
+        <q-checkbox
+          v-model="showDeleted"
+          label="Pokaż usunięte pliki"
+          class="float-left"
+          @update:model-value="onShowDeletedCheckboxUpdate"
         />
       </div>
       <div class="col-6">
@@ -63,6 +73,7 @@
                   label="Usun"
                   class="q-mx-sm"
                   @click="tryDelete()"
+                  v-if="!showDeleted"
                 />
               </div>
               <div class="column">
@@ -101,6 +112,9 @@
           </div>
         </template>
       </q-splitter>
+      <q-inner-loading :showing="isLoading">
+        <q-spinner size="50px" color="primary" />
+      </q-inner-loading>
     </div>
   </div>
 </template>
@@ -120,6 +134,8 @@ export default {
       ticked: [],
       splitterModel: 50,
       isVersionsDialogVisible: false,
+      showDeleted: false,
+      isLoading: false,
     };
   },
   computed: {
@@ -146,13 +162,10 @@ export default {
     ]),
     async tryDelete() {
       await this.deleteFile(this.getSelectedObject.relativePath);
-      this.getUserDriveDataToTreeView().then((response) => {
-        this.userDirectories = response;
-        this.selected = null;
-        this.$q.notify({
-          type: "positive",
-          message: `Plik usunięty pomyślnie!`,
-        });
+      await this.loadUserDriveData();
+      this.$q.notify({
+        type: "positive",
+        message: `Plik usunięty pomyślnie!`,
       });
     },
     async tryDownload() {
@@ -167,24 +180,29 @@ export default {
         name: this.getSelectedObject.name,
       });
     },
-    onDialogHideSelected() {
+    async onDialogHideSelected() {
       this.isVersionsDialogVisible = false;
-      this.selected = null;
+      await this.loadUserDriveData();
       this.$q.notify({
         type: "positive",
         message: `Wersja wybrana pomyślnie!`,
       });
-      this.getUserDriveDataToTreeView().then((response) => {
-        this.userDirectories = response;
-      });
     },
-    loadUserDriveData() {
-      this.getUserDriveDataToTreeView().then((response) => {
-        this.userDirectories = response;
-      });
+    async loadUserDriveData() {
+      this.isLoading = true;
+      this.selected = null;
+      await this.getUserDriveDataToTreeView(this.showDeleted).then(
+        (response) => {
+          this.userDirectories = response;
+          this.isLoading = false;
+        }
+      );
     },
     async tryDownloadTickedFiles() {
       await this.downloadTickedFiles(this.ticked);
+    },
+    onShowDeletedCheckboxUpdate(val, e) {
+      this.loadUserDriveData();
     },
   },
   mounted() {

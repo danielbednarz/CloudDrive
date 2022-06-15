@@ -41,7 +41,7 @@ namespace CloudDrive.WebAPI
 
         [Authorize]
         [HttpGet("getUserDriveDataToTreeView")]
-        public async Task<IActionResult> GetUserDriveDataToTreeView()
+        public async Task<IActionResult> GetUserDriveDataToTreeView(bool showDeleted)
         {
             var loggedUsername = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -50,7 +50,7 @@ namespace CloudDrive.WebAPI
                 return NotFound("Błąd przy próbie znalezienia użytkownika");
             }
 
-            List<UserDirectoryDTO> list = await _directoryService.GetUserDriveDataToTreeView(loggedUsername);
+            List<UserItemDTO> list = await _directoryService.GetUserDriveDataToTreeView(loggedUsername, showDeleted);
             return Ok(list);
         }
 

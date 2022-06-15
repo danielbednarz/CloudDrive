@@ -22,20 +22,31 @@ namespace CloudDrive.Application
             _config = config;
         }
 
-        public async Task<List<UserDirectoryDTO>> GetUserDriveDataToTreeView(string username)
+        public async Task<List<UserItemDTO>> GetUserDriveDataToTreeView(string username, bool showDeleted)
         {
-            UserDirectory mainDirectory = _directoryRepository.FirstOrDefault(x => x.RelativePath == username) ?? throw new Exception("Uzytkownik nie posiada katalogu");
-            List<UserDirectory> listDirectories = await _directoryRepository.GetUserDriveDataToTreeView(username, mainDirectory.Id);
-            List<UserFile> listFiles = await _fileRepository.GetUserDriveFilesToTreeView(mainDirectory.Id);
-            List<UserDirectoryDTO> listDTO = FromUserDirectoryToDTO(listDirectories);
+            List<UserDirectory> listDirectories = new();
+            List<UserFile> listFiles = new();
+            if (!showDeleted)
+            {
+                UserDirectory mainDirectory = _directoryRepository.FirstOrDefault(x => x.RelativePath == username) ?? throw new Exception("Uzytkownik nie posiada katalogu");
+                listDirectories = await _directoryRepository.GetUserDriveDataToTreeView(username, mainDirectory.Id);
+                listFiles = await _fileRepository.GetUserDriveFilesToTreeView(mainDirectory.Id);
+            }
+            else
+            {
+                UserDirectory archiveDirectory = _directoryRepository.FirstOrDefault(x => x.RelativePath == $"{username}\\archive") ?? throw new Exception("Uzytkownik nie posiada katalogu archiwum");
+                //listDirectories = await _directoryRepository.GetUserDriveDeletedDataToTreeView(username, archiveDirectory.Id);
+                listFiles = await _fileRepository.GetUserDriveDeletedFilesToTreeView(archiveDirectory.Id);
+            }
+            List<UserItemDTO> listDTO = FromUserDirectoryToDTO(listDirectories);
             listDTO.AddRange(FromUserFileToDTO(listFiles));
 
             return listDTO;
         }
 
-        private List<UserDirectoryDTO> FromUserDirectoryToDTO(List<UserDirectory> userDirectory)
+        private List<UserItemDTO> FromUserDirectoryToDTO(List<UserDirectory> userDirectory)
         {
-            return userDirectory.Select(x => new UserDirectoryDTO()
+            return userDirectory.Select(x => new UserItemDTO()
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -47,9 +58,9 @@ namespace CloudDrive.Application
             }).ToList();
         }
 
-        private List<UserDirectoryDTO> FromUserFileToDTO(List<UserFile> userFile)
+        private List<UserItemDTO> FromUserFileToDTO(List<UserFile> userFile)
         {
-            var userFiles = userFile.Where(x => !x.IsDeleted).GroupBy(x => x.RelativePath).Select(y => y.OrderByDescending(z => z.FileVersion).First()).Select(x => new UserDirectoryDTO()
+            var userFiles = userFile.GroupBy(x => x.RelativePath).Select(y => y.OrderByDescending(z => z.FileVersion).First()).Select(x => new UserItemDTO()
             {
                 Id = x.Id,
                 Name = x.Name,
