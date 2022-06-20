@@ -29,15 +29,7 @@ namespace FileWatcherWinForms
             AutoRunOnWindowsStartup();
             WindowAppearance();
 
-            connection = new HubConnectionBuilder()
-                .WithUrl("https://localhost:44390/file-hub?username=" + Properties.Settings.Default["usernameForm"].ToString())
-                .Build();
-
-            connection.Closed += async (error) =>
-            {
-                await Task.Delay(new Random().Next(0, 5) * 1000);
-                await connection.StartAsync();
-            };
+           
         }
 
 
@@ -163,6 +155,11 @@ namespace FileWatcherWinForms
         }
 
         private async void CloudDrive_Load(object sender, EventArgs e)
+        {
+          
+        }
+
+        private async void RunSignalR()
         {
             connection.On<string, string>("FileAdded", (username, fileName) =>
             {
@@ -299,6 +296,18 @@ namespace FileWatcherWinForms
                     currentUser = userDTO.username;
                     currentTokenUser = userDTO.token;
                     checkFile(userDTO.token, userDTO.username);
+
+                    connection = new HubConnectionBuilder()
+                        .WithUrl("https://localhost:44390/file-hub?username=" + Properties.Settings.Default["usernameForm"].ToString())
+                        .Build();
+
+                    RunSignalR();
+
+                    connection.Closed += async (error) =>
+                    {
+                        await Task.Delay(new Random().Next(0, 5) * 1000);
+                        await connection.StartAsync();
+                    };
                 }
             }
             else MessageBox.Show(this, "B³êdna nazwa u¿ytkownika, lub has³o.");
