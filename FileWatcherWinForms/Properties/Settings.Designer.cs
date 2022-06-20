@@ -57,5 +57,17 @@ namespace FileWatcherWinForms.Properties {
                 this["passwordForm"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string cloudDriveObserved {
+            get {
+                return ((string)(this["cloudDriveObserved"]));
+            }
+            set {
+                this["cloudDriveObserved"] = value;
+            }
+        }
     }
 }

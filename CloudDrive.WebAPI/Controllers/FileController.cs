@@ -110,7 +110,8 @@ namespace CloudDrive.WebAPI
                     Username = loggedUsername,
                 };
 
-                await _fileService.AddFileByFileWatcher(userFile, relativePath);
+                UserFile addedFile = await _fileService.AddFileByFileWatcher(userFile, relativePath);
+                await _hubContext.Clients.Group(loggedUsername).SendAsync("FileAdded", default, addedFile.Name);
             }
 
             return Ok();

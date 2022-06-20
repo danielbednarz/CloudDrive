@@ -81,7 +81,6 @@
             this.observedPath.ReadOnly = true;
             this.observedPath.Size = new System.Drawing.Size(340, 23);
             this.observedPath.TabIndex = 1;
-            this.observedPath.Text = "E:\\test";
             // 
             // button_edit
             // 
