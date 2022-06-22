@@ -2,7 +2,7 @@
 
 namespace CloudDrive.Application
 {
-    public class UserDirectoryDTO
+    public class UserItemDTO
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -10,6 +10,6 @@ namespace CloudDrive.Application
         public string RelativePath { get; set; }
         public bool IsFile { get; set; }
         public bool NoTick { get; set; }
-        public List<UserDirectoryDTO> Children { get; set; }
+        public List<UserItemDTO> Children { get; set; }
     }
 }

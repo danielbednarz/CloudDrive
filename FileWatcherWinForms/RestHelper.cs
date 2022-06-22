@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,10 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace FileWatcherWinForms
 {
@@ -98,5 +103,58 @@ namespace FileWatcherWinForms
             }
             return string.Empty;
         }
+
+        public static async Task<string> GetUserFile(string token, string username)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                using (HttpResponseMessage res = await client.GetAsync(baseURL + "File/getUserFiles"))
+                {
+                    using (HttpContent content = res.Content)
+                    {
+                        string data = await content.ReadAsStringAsync();
+                       
+                        if (data != null)
+                        {
+                            return data;
+                        }
+                    }
+                }
+            }
+            return string.Empty;
+        }
+
+        public static async Task<string> DownloadFile(string token, Guid idFile, string filePath)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                using (var res = await client.GetAsync(baseURL + "File/downloadFile?fileId=" +idFile))
+                {
+                    using (HttpContent content = res.Content)
+                    {
+                        var data = await content.ReadAsStreamAsync();
+
+                        if (data != null)
+                        {
+                            var fileInfo = new FileInfo(filePath);
+                            string relativePath = Path.GetDirectoryName(filePath);
+                            if (!Directory.Exists(relativePath))
+                            {
+                                DirectoryInfo di = Directory.CreateDirectory(relativePath);
+                            }
+                            using (var fileStream = fileInfo.OpenWrite())
+                            {
+                                await data.CopyToAsync(fileStream);
+                            }
+                            return res.StatusCode.ToString();
+                        }
+                    }
+                }
+            }
+            return string.Empty;
+        }
+
     }
 }

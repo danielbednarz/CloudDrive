@@ -22,20 +22,31 @@ namespace CloudDrive.Application
             _config = config;
         }
 
-        public async Task<List<UserDirectoryDTO>> GetUserDriveDataToTreeView(string username)
+        public async Task<List<UserItemDTO>> GetUserDriveDataToTreeView(string username, bool showDeleted)
         {
-            UserDirectory mainDirectory = _directoryRepository.FirstOrDefault(x => x.RelativePath == username) ?? throw new Exception("Uzytkownik nie posiada katalogu");
-            List<UserDirectory> listDirectories = await _directoryRepository.GetUserDriveDataToTreeView(username, mainDirectory.Id);
-            List<UserFile> listFiles = await _fileRepository.GetUserDriveFilesToTreeView(mainDirectory.Id);
-            List<UserDirectoryDTO> listDTO = FromUserDirectoryToDTO(listDirectories);
+            List<UserDirectory> listDirectories = new();
+            List<UserFile> listFiles = new();
+            if (!showDeleted)
+            {
+                UserDirectory mainDirectory = _directoryRepository.FirstOrDefault(x => x.RelativePath == username) ?? throw new Exception("Uzytkownik nie posiada katalogu");
+                listDirectories = await _directoryRepository.GetUserDriveDataToTreeView(username, mainDirectory.Id);
+                listFiles = await _fileRepository.GetUserDriveFilesToTreeView(mainDirectory.Id);
+            }
+            else
+            {
+                UserDirectory archiveDirectory = _directoryRepository.FirstOrDefault(x => x.RelativePath == $"{username}\\archive") ?? throw new Exception("Uzytkownik nie posiada katalogu archiwum");
+                //listDirectories = await _directoryRepository.GetUserDriveDeletedDataToTreeView(username, archiveDirectory.Id);
+                listFiles = await _fileRepository.GetUserDriveDeletedFilesToTreeView(archiveDirectory.Id);
+            }
+            List<UserItemDTO> listDTO = FromUserDirectoryToDTO(listDirectories);
             listDTO.AddRange(FromUserFileToDTO(listFiles));
 
             return listDTO;
         }
 
-        private List<UserDirectoryDTO> FromUserDirectoryToDTO(List<UserDirectory> userDirectory)
+        private List<UserItemDTO> FromUserDirectoryToDTO(List<UserDirectory> userDirectory)
         {
-            return userDirectory.Select(x => new UserDirectoryDTO()
+            return userDirectory.Select(x => new UserItemDTO()
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -47,9 +58,9 @@ namespace CloudDrive.Application
             }).ToList();
         }
 
-        private List<UserDirectoryDTO> FromUserFileToDTO(List<UserFile> userFile)
+        private List<UserItemDTO> FromUserFileToDTO(List<UserFile> userFile)
         {
-            var userFiles = userFile.Where(x => !x.IsDeleted).GroupBy(x => x.RelativePath).Select(y => y.OrderByDescending(z => z.FileVersion).First()).Select(x => new UserDirectoryDTO()
+            var userFiles = userFile.GroupBy(x => x.RelativePath).Select(y => y.OrderByDescending(z => z.FileVersion).First()).Select(x => new UserItemDTO()
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -123,7 +134,7 @@ namespace CloudDrive.Application
             return await _directoryRepository.GetDirectoriesToSelectList(user.Id, username);
         }
 
-        public async Task<DownloadDirectoryDTO> CreateCompressedDirectory(Guid id, string username)
+        public async Task<DownloadDirectoryDTO> CreateCompressedDirectory(Guid id)
         {
             string mainPath = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>().SaveFilePath;
 
@@ -132,19 +143,13 @@ namespace CloudDrive.Application
             string directoryPath = Path.Combine(mainPath, directory.RelativePath);
             string compressedDirectoryPath = directoryPath + ".zip";
 
-            using FileStream zipFile = File.Open(compressedDirectoryPath, FileMode.Create);
-
-            await AddFilesToCompressedDirectory(id, mainPath, zipFile);
-
-            string[] childDirectoriesPaths = GetChildDirectoriesPaths(directoryPath);
-            foreach (var childDirectoryPath in childDirectoriesPaths)
+            if (File.Exists(compressedDirectoryPath))   // usunięcie zipa jeśli już istnieje o identycznej nazwie
             {
-                string relativeChildDirectoryPath = childDirectoryPath.Substring(mainPath.Length + 1);  // stworzenie ścieżki względnej
-
-                UserDirectory subDirectory = await _directoryRepository.GetDirectoryByRelativePath(relativeChildDirectoryPath, username);
-
-                await AddFilesToParentCompressedDirectory(subDirectory, mainPath, compressedDirectoryPath);
+                File.Delete(compressedDirectoryPath);
             }
+
+            ZipFile.CreateFromDirectory(directoryPath, compressedDirectoryPath);
+            await RenameZipFiles(compressedDirectoryPath, directory.RelativePath);
 
             try
             {
@@ -158,42 +163,29 @@ namespace CloudDrive.Application
             }
         }
 
-        private async Task AddFilesToCompressedDirectory(Guid directoryId, string mainPath, FileStream zipFile)
+        private async Task RenameZipFiles(string zipDirectory, string directoryRelativePath)
         {
-            using var archive = new ZipArchive(zipFile, ZipArchiveMode.Create);
+            using var archive = new ZipArchive(File.Open(zipDirectory, FileMode.Open, FileAccess.ReadWrite), ZipArchiveMode.Update);
 
-            var filesFromDirectory = await _directoryRepository.GetFilesFromDirectory(directoryId);
-            foreach (var file in filesFromDirectory)
+            var files = archive.Entries.ToArray();
+            foreach (var entry in files)
             {
-                var absolutePathToFileWithFileName = Path.Combine(mainPath, file.RelativePath);
-                var absolutePathToFileWithId = absolutePathToFileWithFileName.Replace(file.Name, file.Id.ToString());   //nazwa pliku z Guid -> FileName
+                var fileId = Guid.Parse(entry.Name);
 
-                archive.CreateEntryFromFile(absolutePathToFileWithId, file.Name);
+                UserFile file = await _fileRepository.GetFileByIdAsync(fileId);
+
+                var fileNameWithSubdirectory = file.RelativePath.Replace(directoryRelativePath + "\\", "");
+
+                var newZipFileEntry = archive.CreateEntry(fileNameWithSubdirectory);
+                using (var zipFile = entry.Open())
+                {
+                    using var newZipFile = newZipFileEntry.Open();
+                    zipFile.CopyTo(newZipFile);
+
+                }
+
+                entry.Delete();
             }
-
-            archive.Dispose();
-        }
-
-        private async Task AddFilesToParentCompressedDirectory(UserDirectory directory, string mainPath, string compressedDirectoryPath)
-        {
-            using FileStream zipFile = File.Open(compressedDirectoryPath, FileMode.OpenOrCreate);
-            using var archive = new ZipArchive(zipFile, ZipArchiveMode.Update);
-
-            var filesFromDirectory = await _directoryRepository.GetFilesFromDirectory(directory.Id);
-            foreach (var file in filesFromDirectory)
-            {
-                var absolutePathToFileWithFileName = Path.Combine(mainPath, file.RelativePath);
-                var absolutePathToFileWithId = absolutePathToFileWithFileName.Replace(file.Name, file.Id.ToString());   //nazwa pliku z Guid -> FileName
-
-                archive.CreateEntryFromFile(absolutePathToFileWithId, file.Name);
-            }
-
-            archive.Dispose();
-        }
-
-        private static string[] GetChildDirectoriesPaths(string directoryPath)
-        {
-            return Directory.GetDirectories(directoryPath, "*", SearchOption.AllDirectories);
         }
 
         public async Task<DownloadDirectoryDTO> CreateSelectedFilesDirectory(List<Guid> fileIds, string username)
@@ -227,7 +219,7 @@ namespace CloudDrive.Application
 
             foreach (var fileId in fileIds)
             {
-                UserFile file = await _fileRepository.GetFileById(fileId);
+                UserFile file = await _fileRepository.GetFileByIdAsync(fileId);
 
                 var absolutePathToFileWithFileName = Path.Combine(mainPath, file.RelativePath);
                 var absolutePathToFileWithId = absolutePathToFileWithFileName.Replace(file.Name, file.Id.ToString());   //nazwa pliku z Guid -> FileName
