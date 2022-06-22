@@ -8,6 +8,7 @@ using System.Security.Claims;
 
 namespace CloudDrive.WebAPI
 {
+    [Authorize]
     public class FileController : AppController
     {
         private readonly IFileService _fileService;
@@ -23,7 +24,6 @@ namespace CloudDrive.WebAPI
 
         #region Files
 
-        [Authorize]
         [HttpGet("getUserFiles")]
         public async Task<IActionResult> GetUserFiles()
         {
@@ -39,7 +39,6 @@ namespace CloudDrive.WebAPI
             return Ok(list);
         }
 
-        [Authorize]
         [HttpGet("getUserDriveDataToTreeView")]
         public async Task<IActionResult> GetUserDriveDataToTreeView(bool showDeleted)
         {
@@ -54,8 +53,6 @@ namespace CloudDrive.WebAPI
             return Ok(list);
         }
 
-
-        [Authorize]
         [RequestSizeLimit(2000 * 1024 * 1024)]
         [HttpPost("uploadFile")]
         public async Task<IActionResult> UploadFile()
@@ -88,7 +85,6 @@ namespace CloudDrive.WebAPI
             return Ok();
         }
 
-        [Authorize]
         [HttpPost("uploadFileByFileWatcher")]
         public async Task<IActionResult> UploadFileByFileWathcer(string relativePath)
         {
@@ -102,8 +98,6 @@ namespace CloudDrive.WebAPI
 
             if (file.Length > 0)
             {
-                //var dictionaryId = Request.Form.FirstOrDefault(x => x.Key == "DirectoryId");
-
                 AddUserFileVM userFile = new()
                 {
                     File = file,
@@ -117,7 +111,6 @@ namespace CloudDrive.WebAPI
             return Ok();
         }
 
-        [Authorize]
         [HttpDelete("deleteFile")]
         public async Task<IActionResult> DeleteFile(string relativePath)
         {
@@ -133,7 +126,6 @@ namespace CloudDrive.WebAPI
             return Ok();
         }
 
-        [Authorize]
         [HttpGet("getFileVersions")]
         public async Task<IActionResult> GetFileVersions(Guid fileId)
         {
@@ -141,7 +133,6 @@ namespace CloudDrive.WebAPI
             return Ok(fileVersions);
         }
 
-        [Authorize]
         [HttpPost("selectFileVersion")]
         public async Task<IActionResult> SelectFileVersion(Guid id)
         {
@@ -156,7 +147,6 @@ namespace CloudDrive.WebAPI
             return Ok();
         }
 
-        [Authorize]
         [HttpGet("downloadFile")]
         public async Task<IActionResult> DownloadFile(Guid fileId)
         {
@@ -181,7 +171,6 @@ namespace CloudDrive.WebAPI
 
         #region Directories
 
-        [Authorize]
         [HttpPost("addDirectory")]
         public async Task<IActionResult> AddDirectory(AddDirectoryVM model)
         {
@@ -197,7 +186,6 @@ namespace CloudDrive.WebAPI
             return Ok();
         }
         
-        [Authorize]
         [HttpGet("getDirectoriesToSelectList")]
         public async Task<IActionResult> GetDirectoriesToSelectList()
         {
@@ -213,7 +201,6 @@ namespace CloudDrive.WebAPI
             return Ok(list);
         }
 
-        [Authorize]
         [HttpGet("downloadSelectedFiles")]
         public async Task<IActionResult> DownloadSelectedFiles([FromQuery]List<Guid> fileIds)
         {
@@ -229,7 +216,6 @@ namespace CloudDrive.WebAPI
             return File(downloadDirectoryDTO.Bytes, "application/zip", downloadDirectoryDTO.DirectoryName);
         }
 
-        [Authorize]
         [HttpGet("downloadDirectory")]
         public async Task<IActionResult> DownloadDirectory(Guid directoryId)
         {
