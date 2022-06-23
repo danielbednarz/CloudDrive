@@ -47,6 +47,8 @@
 import MainContainer from "../components/MainContainer";
 import DirectoryAddForm from "../components/DirectoryAddForm";
 import FilesGrid from "../components/FilesGrid";
+import { useAuthenticationStore } from "src/stores/authentication";
+import { mapState } from "pinia";
 
 export default {
   name: "DrivePage",
@@ -54,6 +56,9 @@ export default {
     return {
       isAddDirectoryMenuOpen: false,
     };
+  },
+  computed: {
+    ...mapState(useAuthenticationStore, ["signalrConnection"]),
   },
   components: {
     MainContainer,
@@ -71,6 +76,12 @@ export default {
       this.isAddDirectoryMenuOpen = false;
       this.$refs["filesGrid"].loadUserDriveData();
     },
+  },
+  mounted() {
+    const context = this;
+    this.signalrConnection.on("FileAdded", (id, fileName) => {
+      context.$refs["filesGrid"].loadUserDriveData();
+    });
   },
 };
 </script>
