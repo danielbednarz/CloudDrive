@@ -17,7 +17,7 @@ namespace FileWatcherWinForms
 {
     internal class RestHelper
     {
-        private static readonly string baseURL = Properties.Settings.Default["baseURL"].ToString();
+        private static readonly string baseURL = File.ReadAllText("serwer.txt");
 
         public static async Task<string> Login(User user)
         {
