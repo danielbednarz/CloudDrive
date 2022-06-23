@@ -94,10 +94,22 @@ export default {
       this.$emit("closePopover");
     },
     async tryRegister() {
-      await this.register();
-      let connection = connectToHub(this.currentUser.username, this.$q);
-      this.signalrConnection = connection;
-      this.closePopover();
+      try {
+        await this.register();
+        let connection = await connectToHub(this.currentUser.username, this.$q);
+        this.signalrConnection = connection;
+        this.$q.notify({
+          type: "info",
+          message: `Zarejestrowano i zalogowano pomyślnie`,
+        });
+      } catch (ex) {
+        this.$q.notify({
+          type: "negative",
+          message: ex.response.data,
+        });
+      } finally {
+        this.closePopover();
+      }
     },
   },
   mounted() {

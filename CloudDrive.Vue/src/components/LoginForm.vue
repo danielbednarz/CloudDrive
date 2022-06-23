@@ -75,16 +75,22 @@ export default {
       this.$emit("closePopover");
     },
     async tryLogin() {
-      await this.login();
-
-      let connection = connectToHub(this.currentUser.username, this.$q);
-      this.signalrConnection = connection;
-
-      this.closePopover();
-      this.$q.notify({
-        type: "info",
-        message: `Zalogowano pomyślnie`,
-      });
+      try {
+        await this.login();
+        let connection = await connectToHub(this.currentUser.username, this.$q);
+        this.signalrConnection = connection;
+        this.$q.notify({
+          type: "info",
+          message: `Zalogowano pomyślnie`,
+        });
+      } catch (ex) {
+        this.$q.notify({
+          type: "negative",
+          message: ex.response.data,
+        });
+      } finally {
+        this.closePopover();
+      }
     },
   },
   mounted() {
