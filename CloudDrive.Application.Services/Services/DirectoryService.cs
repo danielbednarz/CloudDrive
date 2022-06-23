@@ -3,7 +3,6 @@ using CloudDrive.Data.Abstraction;
 using CloudDrive.Domain;
 using Microsoft.Extensions.Configuration;
 using System.IO.Compression;
-using System.Text.RegularExpressions;
 
 namespace CloudDrive.Application
 {
@@ -35,7 +34,6 @@ namespace CloudDrive.Application
             else
             {
                 UserDirectory archiveDirectory = _directoryRepository.FirstOrDefault(x => x.RelativePath == $"{username}\\archive") ?? throw new Exception("Uzytkownik nie posiada katalogu archiwum");
-                //listDirectories = await _directoryRepository.GetUserDriveDeletedDataToTreeView(username, archiveDirectory.Id);
                 listFiles = await _fileRepository.GetUserDriveDeletedFilesToTreeView(archiveDirectory.Id);
             }
             List<UserItemDTO> listDTO = FromUserDirectoryToDTO(listDirectories);

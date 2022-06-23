@@ -2,7 +2,6 @@
 using CloudDrive.Data.Abstraction;
 using CloudDrive.Domain;
 using CloudDrive.EntityFramework;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace CloudDrive.Data.Repositories
