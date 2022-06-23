@@ -126,16 +126,16 @@ namespace CloudDrive.Application
         {
             var fileUploadConfig = _config.GetSection("FileUploadConfig").Get<FileUploadConfig>();
             var file = await _fileRepository.GetFileByIdAsync(fileId);
-            var fileDirectory = await _directoryRepository.FirstOrDefaultAsync(x => x.User.Username == username && x.Id == file.DirectoryId);
 
             if (file == null)
             {
                 return null;
             }
 
-            string filePath = $"{fileUploadConfig.SaveFilePath}\\{fileDirectory.RelativePath}\\{file.Id.ToString()}";
+            var fileDirectory = await _directoryRepository.FirstOrDefaultAsync(x => x.User.Username == username && x.Id == file.DirectoryId);
+            var filePath = $"{fileUploadConfig.SaveFilePath}\\{fileDirectory.RelativePath}\\{file.Id.ToString()}";
 
-            var bytes = await File.ReadAllBytesAsync(filePath);
+            byte[] bytes = await File.ReadAllBytesAsync(filePath);
 
             return new DownloadFileDTO { Bytes = bytes, Path = filePath, UserFile = file };
         }
