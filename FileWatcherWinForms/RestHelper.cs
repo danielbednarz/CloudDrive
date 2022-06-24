@@ -17,7 +17,7 @@ namespace FileWatcherWinForms
 {
     internal class RestHelper
     {
-        private static readonly string baseURL = "https://localhost:44390/api/";
+        private static readonly string baseURL = File.ReadAllText("serwer.txt");
 
         public static async Task<string> Login(User user)
         {

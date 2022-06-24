@@ -69,5 +69,17 @@ namespace FileWatcherWinForms.Properties {
                 this["cloudDriveObserved"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://localhost:44390/api/")]
+        public string baseURL {
+            get {
+                return ((string)(this["baseURL"]));
+            }
+            set {
+                this["baseURL"] = value;
+            }
+        }
     }
 }

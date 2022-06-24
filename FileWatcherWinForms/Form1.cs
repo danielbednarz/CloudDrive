@@ -22,14 +22,13 @@ namespace FileWatcherWinForms
         string currentUser;
         string currentTokenUser;
         HubConnection connection;
+        private static readonly string baseURL = File.ReadAllText("serwer.txt");
 
         public CloudDrive()
         {
             InitializeComponent();
             AutoRunOnWindowsStartup();
             WindowAppearance();
-
-           
         }
 
 
@@ -127,6 +126,8 @@ namespace FileWatcherWinForms
             button_edit.Visible = false;
             button_save.Visible = true;
             observedPath.ReadOnly = false;
+
+            connection.StopAsync();
         }
 
         private void button_save_Click(object sender, EventArgs e)
@@ -145,6 +146,12 @@ namespace FileWatcherWinForms
                 Properties.Settings.Default["cloudDriveObserved"] = "";
             }
             Properties.Settings.Default.Save();
+
+            connection = new HubConnectionBuilder()
+                       .WithUrl(baseURL + "api/file-hub?username=" + Properties.Settings.Default["usernameForm"].ToString())
+                       .Build();
+
+            RunSignalR();
 
         }
 
@@ -219,12 +226,13 @@ namespace FileWatcherWinForms
             {
                 string relativePathFromServer = file.RelativePath.Replace((currentUser + "\\"), "");
                 newRelativePathFromServer.Add(relativePathFromServer);
+
             }
 
             foreach (FileDTO file in convert)
             {
                 string relativePathFromServer = file.RelativePath.Replace((currentUser + "\\"), "");
-
+             
                 foreach (string str in entries)
                 {
                     FileAttributes att = File.GetAttributes(str);
@@ -298,16 +306,10 @@ namespace FileWatcherWinForms
                     checkFile(userDTO.token, userDTO.username);
 
                     connection = new HubConnectionBuilder()
-                        .WithUrl("https://localhost:44390/file-hub?username=" + Properties.Settings.Default["usernameForm"].ToString())
+                        .WithUrl(baseURL + "file-hub?username=" + userDTO.username)
                         .Build();
 
                     RunSignalR();
-
-                    connection.Closed += async (error) =>
-                    {
-                        await Task.Delay(new Random().Next(0, 5) * 1000);
-                        await connection.StartAsync();
-                    };
                 }
             }
             else MessageBox.Show(this, "B³êdna nazwa u¿ytkownika, lub has³o.");
@@ -359,6 +361,7 @@ namespace FileWatcherWinForms
             currentUser = "";
             currentTokenUser = "";
             buttonLogOut.Visible = false;
+            connection.StopAsync();
         }
     }
 }

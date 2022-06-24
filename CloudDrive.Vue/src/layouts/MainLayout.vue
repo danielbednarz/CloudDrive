@@ -54,7 +54,7 @@
         :isLoginPopoverVisibleProp="isLoginPopoverVisible"
         @closePopover="hideLoginPopover"
       />
-      <router-view />
+      <router-view v-if="isLoaded" />
     </q-page-container>
   </q-layout>
 </template>
@@ -97,6 +97,7 @@ const linksList = [
 
 import { mapActions, mapWritableState } from "pinia";
 import { useAuthenticationStore } from "../stores/authentication.js";
+import { connectToHub } from "../hubs/file-hub";
 
 export default {
   name: "MainLayout",
@@ -110,10 +111,14 @@ export default {
       rightDrawerOpen: false,
       essentialLinks: linksList,
       isLoginPopoverVisible: false,
+      isLoaded: false,
     };
   },
   computed: {
-    ...mapWritableState(useAuthenticationStore, ["currentUser"]),
+    ...mapWritableState(useAuthenticationStore, [
+      "currentUser",
+      "signalrConnection",
+    ]),
   },
   methods: {
     ...mapActions(useAuthenticationStore, ["logout"]),
@@ -131,12 +136,6 @@ export default {
     hideLoginPopover() {
       this.isLoginPopoverVisible = false;
     },
-    onFileAdded({ id, fileName }) {
-      this.$q.notify({
-        type: "info",
-        message: `Z innego urządzenia został dodany nowy plik ${fileName}`,
-      });
-    },
     tryLogout() {
       this.logout();
       this.$q.notify({
@@ -145,6 +144,27 @@ export default {
       });
       this.$router.push({ name: "home" });
     },
+  },
+  mounted() {
+    this.$q.loading.show({
+      message: "Nawiązuję połączenie z serwerem...",
+    });
+    if (localStorage.user) {
+      let localStorageUser = JSON.parse(localStorage.user);
+      this.currentUser.username = localStorageUser.username;
+      this.currentUser.token = localStorageUser.token;
+
+      connectToHub(localStorageUser.username, this.$q).then((response) => {
+        this.$q.loading.hide();
+        this.signalrConnection = response;
+        this.isLoaded = true;
+      });
+    } else {
+      this.$api.get("/Users/checkConnection").then(() => {
+        this.$q.loading.hide();
+        this.isLoaded = true;
+      });
+    }
   },
 };
 </script>
