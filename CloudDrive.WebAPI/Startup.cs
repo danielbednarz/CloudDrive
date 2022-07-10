@@ -80,7 +80,11 @@ namespace CloudDrive.WebAPI
                         ValidateAudience = false,
                     };
                 });
-            services.AddSignalR();
+            services.AddSignalR(options =>
+            {
+                options.KeepAliveInterval = TimeSpan.FromMinutes(5);
+                options.HandshakeTimeout = TimeSpan.FromMinutes(5);
+            });
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

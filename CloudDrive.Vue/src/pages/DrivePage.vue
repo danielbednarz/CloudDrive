@@ -55,10 +55,14 @@ export default {
   data() {
     return {
       isAddDirectoryMenuOpen: false,
+      filesGrid: null,
     };
   },
   computed: {
     ...mapState(useAuthenticationStore, ["signalrConnection"]),
+    getFilesGrid() {
+      return this.$refs["filesGrid"];
+    },
   },
   components: {
     MainContainer,
@@ -74,13 +78,13 @@ export default {
     },
     onDirectoryAddFormClose() {
       this.isAddDirectoryMenuOpen = false;
-      this.$refs["filesGrid"].loadUserDriveData();
+      this.getFilesGrid.loadUserDriveData();
     },
   },
   mounted() {
-    const context = this;
+    let context = this;
     this.signalrConnection.on("FileAdded", (id, fileName) => {
-      context.$refs["filesGrid"].loadUserDriveData();
+      context.getFilesGrid.loadUserDriveData();
     });
   },
 };

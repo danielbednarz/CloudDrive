@@ -2,12 +2,14 @@ import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
 const connectToHub = async (username, q) => {
   const connection = new HubConnectionBuilder()
-    .withUrl(`http://192.168.55.109:8005/file-hub?username=${username}`, {
+    .withUrl(`http://192.168.166.44:8005/file-hub?username=${username}`, {
       withCredentials: false,
     })
     .configureLogging(LogLevel.Information)
     .build();
 
+  connection.serverTimeoutInMilliseconds = 500000;
+  connection.keepAliveIntervalInMilliseconds = 500000;
   connection.on("FileAdded", (id, fileName) => {
     q.notify({
       type: "positive",
@@ -15,7 +17,7 @@ const connectToHub = async (username, q) => {
     });
   });
 
-  await connection.start({ withCredentials: false });
+  await connection.start({ withCredentials: false, transport: "longPolling" });
 
   return connection;
 };

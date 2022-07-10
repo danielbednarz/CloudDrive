@@ -144,25 +144,37 @@ export default {
       });
       this.$router.push({ name: "home" });
     },
+    async connectToSignalR() {
+      let localStorageUser = JSON.parse(localStorage.user);
+      this.currentUser.username = localStorageUser.username;
+      this.currentUser.token = localStorageUser.token;
+      await connectToHub(localStorageUser.username, this.$q).then(
+        (response) => {
+          this.$q.loading.hide();
+          this.signalrConnection = response;
+          this.isLoaded = true;
+        }
+      );
+    },
   },
   mounted() {
     this.$q.loading.show({
       message: "Nawiązuję połączenie z serwerem...",
     });
-    if (localStorage.user) {
-      let localStorageUser = JSON.parse(localStorage.user);
-      this.currentUser.username = localStorageUser.username;
-      this.currentUser.token = localStorageUser.token;
-
-      connectToHub(localStorageUser.username, this.$q).then((response) => {
-        this.$q.loading.hide();
-        this.signalrConnection = response;
-        this.isLoaded = true;
-      });
-    } else {
-      this.$api.get("/Users/checkConnection").then(() => {
-        this.$q.loading.hide();
-        this.isLoaded = true;
+    try {
+      if (localStorage.user) {
+        this.connectToSignalR();
+      } else {
+        this.$api.get("/Users/checkConnection").then(() => {
+          this.$q.loading.hide();
+          this.isLoaded = true;
+        });
+      }
+    } catch (ex) {
+      this.$q.loading.hide();
+      this.$q.loading.show({
+        message: "Błąd podczas łączenia z serwerem.",
+        spinnerSize: 0,
       });
     }
   },

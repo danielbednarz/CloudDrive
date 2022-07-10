@@ -38,6 +38,7 @@
             text-color="secondary"
             outline
             type="submit"
+            :loading="isLoading"
           />
         </q-form>
       </q-card-section>
@@ -61,6 +62,7 @@ export default {
   data() {
     return {
       isLoginPopoverVisible: false,
+      isLoading: false,
     };
   },
   computed: {
@@ -76,6 +78,7 @@ export default {
     },
     async tryLogin() {
       try {
+        this.isLoading = true;
         await this.login();
         let connection = await connectToHub(this.currentUser.username, this.$q);
         this.signalrConnection = connection;
@@ -89,6 +92,7 @@ export default {
           message: ex.response.data,
         });
       } finally {
+        this.isLoading = false;
         this.closePopover();
       }
     },

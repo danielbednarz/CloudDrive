@@ -10,7 +10,7 @@ import axios from "axios";
 const api = axios.create({
   //baseURL: "https://localhost:44390/api",
   //baseURL: "https://clouddriveapi.azurewebsites.net/api",
-  baseURL: "http://192.168.55.109:8005/api",
+  baseURL: "http://192.168.166.44:8005/api",
 });
 
 export default boot(({ app }) => {

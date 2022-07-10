@@ -15,10 +15,10 @@ namespace CloudDrive.Hubs
         }
 
         [Authorize]
-        public override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
-            AddToGroup(Context.GetHttpContext().Request.Query["username"]);
-            return base.OnConnectedAsync();
+            await AddToGroup(Context.GetHttpContext().Request.Query["username"]);
+            await base.OnConnectedAsync();
         }
 
         private async Task AddToGroup(string groupName) => await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
